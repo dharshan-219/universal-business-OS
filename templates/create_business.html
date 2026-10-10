@@ -542,6 +542,123 @@
                 display: none;
             }
         }
+        
+/* Responsive design for phones and tablets */
+
+html {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    width: 100%;
+    min-width: 0;
+}
+
+.app,
+.main,
+.content {
+    min-width: 0;
+    width: 100%;
+}
+
+img,
+input,
+select,
+textarea,
+button {
+    max-width: 100%;
+}
+
+/* Tablets */
+@media (max-width: 1000px) {
+    .sidebar {
+        width: 200px;
+    }
+
+    .content {
+        padding: 24px 18px;
+    }
+
+    .layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* Mobile phones */
+@media (max-width: 600px) {
+    .sidebar {
+        display: none;
+    }
+
+    .topbar {
+        height: auto;
+        min-height: 60px;
+        padding: 14px 16px;
+    }
+
+    .content {
+        padding: 22px 14px;
+    }
+
+    .page-heading {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .page-heading h1 {
+        font-size: 25px;
+        line-height: 1.3;
+    }
+
+    .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .two-columns {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0;
+    }
+
+    .form-body,
+    .card-header {
+        padding: 18px;
+    }
+
+    .field input,
+    .field select {
+        width: 100%;
+        min-height: 46px;
+        font-size: 16px;
+    }
+
+    .form-footer {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .primary-btn {
+        width: 100%;
+        min-height: 48px;
+    }
+
+    .back-link {
+        text-align: center;
+        padding: 8px;
+    }
+
+    .info-column {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .step-badge {
+        white-space: normal;
+    }
+}
+
     </style>
 </head>
 
