@@ -10,11 +10,35 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-import os
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///business_os.db"
+import os
+
+app = Flask(__name__)
+
+app.config["SECRET_KEY"] = os.environ.get(
+    "SECRET_KEY",
+    "local-development-only-change-me"
+)
+
+database_url = os.environ.get(
+    "DATABASE_URL",
+    "sqlite:///business_os.db"
+)
+
+# Render may provide postgres:// or postgresql://.
+# Use the installed Psycopg 3 driver.
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace(
+        "postgres://", "postgresql+psycopg://", 1
+    )
+elif database_url.startswith("postgresql://"):
+    database_url = database_url.replace(
+        "postgresql://", "postgresql+psycopg://", 1
+    )
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
 
 db.init_app(app)
 
