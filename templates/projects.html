@@ -1,0 +1,714 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - {{ business.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .projects-page {
+            --project-primary: #6554d9;
+            --project-dark: #25234a;
+            --project-muted: #777b91;
+            color: #252943;
+        }
+
+        .project-hero {
+            background: linear-gradient(125deg, #25234a, #5143a5 65%, #7867e9);
+            color: white;
+            border-radius: 22px;
+            padding: 30px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-hero::after {
+            content: "";
+            position: absolute;
+            width: 190px;
+            height: 190px;
+            border: 35px solid rgba(255,255,255,.08);
+            border-radius: 50%;
+            right: -40px;
+            top: -75px;
+        }
+
+        .project-hero h2 {
+            margin: 0 0 10px;
+            font-size: 27px;
+        }
+
+        .project-hero p {
+            margin: 0;
+            color: #e1defd;
+            max-width: 540px;
+            line-height: 1.7;
+        }
+
+        .project-hero .hero-label {
+            display: inline-block;
+            background: rgba(255,255,255,.13);
+            border: 1px solid rgba(255,255,255,.2);
+            border-radius: 30px;
+            padding: 6px 12px;
+            margin-bottom: 14px;
+            font-size: 12px;
+            letter-spacing: .5px;
+        }
+
+        .project-stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .project-stat {
+            background: white;
+            border: 1px solid #e9eaf2;
+            border-radius: 17px;
+            padding: 21px;
+            box-shadow: 0 5px 18px rgba(32,34,75,.035);
+            min-width: 0;
+        }
+
+        .project-stat .stat-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            background: #efedff;
+            margin-bottom: 15px;
+            font-size: 21px;
+        }
+
+        .project-stat .stat-label {
+            color: var(--project-muted);
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .project-stat .stat-value {
+            font-size: 25px;
+            font-weight: 750;
+            letter-spacing: -.5px;
+            overflow-wrap: anywhere;
+        }
+
+        .project-stat .stat-note {
+            color: #9295a7;
+            font-size: 12px;
+            margin-top: 7px;
+        }
+
+        .project-layout {
+            display: grid;
+            grid-template-columns: minmax(280px, .8fr) minmax(0, 1.5fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .project-panel {
+            background: white;
+            border: 1px solid #e9eaf2;
+            border-radius: 19px;
+            padding: 23px;
+            box-shadow: 0 5px 18px rgba(32,34,75,.035);
+            min-width: 0;
+        }
+
+        .panel-heading {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .panel-heading h3 {
+            font-size: 18px;
+            margin: 0 0 6px;
+        }
+
+        .panel-heading p {
+            color: var(--project-muted);
+            font-size: 13px;
+            margin: 0;
+        }
+
+        .project-form label {
+            display: block;
+            margin: 15px 0 7px;
+            font-size: 13px;
+            font-weight: 650;
+            color: #444761;
+        }
+
+        .project-form input,
+        .project-form textarea,
+        .project-form select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 13px;
+            border: 1px solid #dfe1ec;
+            border-radius: 10px;
+            background: #fcfcff;
+            color: #292d46;
+            font: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .project-form input:focus,
+        .project-form textarea:focus,
+        .project-form select:focus {
+            border-color: var(--project-primary);
+            box-shadow: 0 0 0 3px rgba(101,84,217,.11);
+        }
+
+        .project-form textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .project-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .project-submit {
+            width: 100%;
+            margin-top: 20px;
+            border: none;
+            border-radius: 11px;
+            padding: 13px 16px;
+            background: linear-gradient(120deg, #6554d9, #8170ed);
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .project-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 7px 17px rgba(101,84,217,.24);
+        }
+
+        .project-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .project-search {
+            flex: 1;
+            min-width: 150px;
+            max-width: 260px;
+            border: 1px solid #e0e2ec;
+            background: #fafaff;
+            border-radius: 10px;
+            padding: 11px 13px;
+            font: inherit;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .project-search:focus {
+            border-color: var(--project-primary);
+        }
+
+        .project-count {
+            background: #efedff;
+            color: #5a49c2;
+            padding: 6px 10px;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .project-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .project-card {
+            border: 1px solid #e8e9f2;
+            border-radius: 15px;
+            padding: 18px;
+            transition: box-shadow .2s, border-color .2s, transform .2s;
+            background: linear-gradient(145deg, #fff, #fdfdff);
+        }
+
+        .project-card:hover {
+            border-color: #d4cef9;
+            box-shadow: 0 8px 22px rgba(39,37,82,.06);
+            transform: translateY(-2px);
+        }
+
+        .project-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .project-title-wrap {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .project-icon {
+            flex-shrink: 0;
+            width: 43px;
+            height: 43px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #efedff;
+            border-radius: 12px;
+            font-size: 21px;
+        }
+
+        .project-card h4 {
+            margin: 2px 0 7px;
+            font-size: 16px;
+            overflow-wrap: anywhere;
+        }
+
+        .project-description {
+            color: var(--project-muted);
+            font-size: 13px;
+            line-height: 1.65;
+            margin: 0 0 17px;
+            overflow-wrap: anywhere;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            flex-shrink: 0;
+            align-items: center;
+            padding: 6px 9px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 750;
+            white-space: nowrap;
+        }
+
+        .status-planned {
+            background: #edf0ff;
+            color: #4c59ba;
+        }
+
+        .status-progress {
+            background: #e5f2ff;
+            color: #1769aa;
+        }
+
+        .status-completed {
+            background: #e2f8eb;
+            color: #18834c;
+        }
+
+        .status-hold {
+            background: #fff0db;
+            color: #a46108;
+        }
+
+        .status-default {
+            background: #f0f0f5;
+            color: #606274;
+        }
+
+        .project-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            border-top: 1px solid #eeeff5;
+            padding-top: 15px;
+        }
+
+        .project-meta-label {
+            color: #9295a7;
+            font-size: 11px;
+            margin-bottom: 6px;
+        }
+
+        .project-meta-value {
+            font-size: 13px;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .project-budget-value {
+            color: #5143b4;
+        }
+
+        .empty-projects {
+            text-align: center;
+            border: 1px dashed #d8d9e8;
+            border-radius: 15px;
+            padding: 38px 18px;
+            color: var(--project-muted);
+        }
+
+        .empty-projects .empty-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .empty-projects h4 {
+            margin: 0 0 8px;
+            color: #333650;
+        }
+
+        .empty-projects p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .no-search-results {
+            display: none;
+            text-align: center;
+            padding: 24px;
+            color: var(--project-muted);
+            font-size: 13px;
+        }
+
+        @media (max-width: 1100px) {
+            .project-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .project-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .project-hero {
+                padding: 23px 20px;
+            }
+
+            .project-hero h2 {
+                font-size: 23px;
+            }
+
+            .project-stats {
+                gap: 10px;
+            }
+
+            .project-stat {
+                padding: 15px;
+            }
+
+            .project-stat .stat-value {
+                font-size: 21px;
+            }
+
+            .project-panel {
+                padding: 17px;
+            }
+
+            .project-form .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .project-card-top {
+                flex-direction: column;
+            }
+
+            .project-toolbar {
+                align-items: stretch;
+            }
+
+            .project-search {
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>Business OS</h2>
+            <p>{{ business.name }}</p>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('business_workspace', business_id=business.id) }}">📊 Dashboard</a>
+            <a href="{{ url_for('customers', business_id=business.id) }}">👥 Customers</a>
+            <a href="{{ url_for('products', business_id=business.id) }}">📦 Products</a>
+            <a href="{{ url_for('sales', business_id=business.id) }}">🛒 Sales</a>
+            <a href="{{ url_for('inventory', business_id=business.id) }}">📋 Inventory</a>
+            <a href="{{ url_for('purchases', business_id=business.id) }}">🚚 Purchases</a>
+            <a href="{{ url_for('finance', business_id=business.id) }}">💰 Finance</a>
+            <a href="{{ url_for('employees', business_id=business.id) }}">👨‍💼 Employees</a>
+            <a class="active" href="{{ url_for('projects', business_id=business.id) }}">📋 Projects</a>
+            <a href="{{ url_for('support', business_id=business.id) }}">🎧 Support</a>
+            <a href="{{ url_for('reports', business_id=business.id) }}">📈 Reports</a>
+            <a href="{{ url_for('business_settings', business_id=business.id) }}">⚙️ Settings</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('dashboard') }}">← My Businesses</a>
+            <a href="{{ url_for('logout') }}">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <h1>Projects</h1>
+                <p>Plan work, manage budgets, and track project progress.</p>
+            </div>
+        </header>
+
+        <section class="content projects-page">
+
+            <div class="project-hero">
+                <span class="hero-label">PROJECT WORKSPACE</span>
+                <h2>Turn plans into progress.</h2>
+                <p>
+                    Organize your business projects, set budgets and deadlines,
+                    and keep track of every project's current status.
+                </p>
+            </div>
+
+            {% set total_budget = projects|sum(attribute='budget') %}
+            {% set planned_count = projects|selectattr('status', 'equalto', 'Planned')|list|length %}
+            {% set progress_count = projects|selectattr('status', 'equalto', 'In Progress')|list|length %}
+            {% set completed_count = projects|selectattr('status', 'equalto', 'Completed')|list|length %}
+
+            <div class="project-stats">
+                <div class="project-stat">
+                    <div class="stat-icon">📁</div>
+                    <div class="stat-label">Total Projects</div>
+                    <div class="stat-value">{{ projects|length }}</div>
+                    <div class="stat-note">Projects in this workspace</div>
+                </div>
+
+                <div class="project-stat">
+                    <div class="stat-icon">🚀</div>
+                    <div class="stat-label">In Progress</div>
+                    <div class="stat-value">{{ progress_count }}</div>
+                    <div class="stat-note">Currently being worked on</div>
+                </div>
+
+                <div class="project-stat">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-label">Completed</div>
+                    <div class="stat-value">{{ completed_count }}</div>
+                    <div class="stat-note">Projects marked completed</div>
+                </div>
+
+                <div class="project-stat">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-label">Combined Budget</div>
+                    <div class="stat-value" style="font-size:21px;">
+                        {{ business.currency }} {{ "%.2f"|format(total_budget or 0) }}
+                    </div>
+                    <div class="stat-note">Total planned project budgets</div>
+                </div>
+            </div>
+
+            <div class="project-layout">
+
+                <div class="project-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h3>＋ Create a Project</h3>
+                            <p>Add a new project to your workspace.</p>
+                        </div>
+                    </div>
+
+                    <form class="project-form" method="POST"
+                          action="{{ url_for('add_project', business_id=business.id) }}">
+
+                        <label for="project-name">Project Name *</label>
+                        <input type="text" id="project-name" name="name"
+                               placeholder="e.g. Website redesign" required>
+
+                        <label for="project-description">Description</label>
+                        <textarea id="project-description" name="description"
+                                  placeholder="What is this project about?"></textarea>
+
+                        <div class="form-row">
+                            <div>
+                                <label for="project-budget">Budget</label>
+                                <input type="number" id="project-budget" name="budget"
+                                       min="0" step="0.01" placeholder="0.00" value="0">
+                            </div>
+
+                            <div>
+                                <label for="project-deadline">Deadline</label>
+                                <input type="date" id="project-deadline" name="deadline">
+                            </div>
+                        </div>
+
+                        <label for="project-status">Initial Status</label>
+                        <select name="status" id="project-status">
+                            <option value="Planned">Planned</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                            <option value="On Hold">On Hold</option>
+                        </select>
+
+                        <button class="project-submit" type="submit">
+                            ＋ Create Project
+                        </button>
+                    </form>
+                </div>
+
+                <div class="project-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Your Projects</h3>
+                            <p>Review your project details and deadlines.</p>
+                        </div>
+                        <span class="project-count">{{ projects|length }} total</span>
+                    </div>
+
+                    <div class="project-toolbar">
+                        <input type="search" id="project-search" class="project-search"
+                               placeholder="🔎 Search projects..." aria-label="Search projects">
+                        <span id="project-results" style="font-size:12px;color:#85889d;">
+                            {{ projects|length }} projects
+                        </span>
+                    </div>
+
+                    {% if projects %}
+                        <div class="project-list" id="project-list">
+                            {% for project in projects %}
+                                {% set normalized_status = (project.status or '')|lower %}
+                                <article class="project-card"
+                                         data-search="{{ (project.name ~ ' ' ~ (project.description or '') ~ ' ' ~ (project.status or ''))|lower }}">
+
+                                    <div class="project-card-top">
+                                        <div class="project-title-wrap">
+                                            <div class="project-icon">📋</div>
+                                            <div>
+                                                <h4>{{ project.name }}</h4>
+                                            </div>
+                                        </div>
+
+                                        <span class="status-badge
+                                            {% if normalized_status == 'planned' %}status-planned
+                                            {% elif normalized_status == 'in progress' %}status-progress
+                                            {% elif normalized_status == 'completed' %}status-completed
+                                            {% elif normalized_status == 'on hold' %}status-hold
+                                            {% else %}status-default{% endif %}">
+                                            {{ project.status or 'Not set' }}
+                                        </span>
+                                    </div>
+
+                                    <p class="project-description">
+                                        {{ project.description or "No description provided for this project." }}
+                                    </p>
+
+                                    <div class="project-meta">
+                                        <div>
+                                            <div class="project-meta-label">PROJECT BUDGET</div>
+                                            <div class="project-meta-value project-budget-value">
+                                                {{ business.currency }} {{ "%.2f"|format(project.budget or 0) }}
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="project-meta-label">DEADLINE</div>
+                                            <div class="project-meta-value">
+                                                {% if project.deadline %}
+                                                    📅 {{ project.deadline.strftime("%d-%m-%Y") }}
+                                                {% else %}
+                                                    Not set
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            {% endfor %}
+                        </div>
+
+                        <div class="no-search-results" id="no-search-results">
+                            No projects match your search. Try another name or status.
+                        </div>
+                    {% else %}
+                        <div class="empty-projects">
+                            <div class="empty-icon">🗂️</div>
+                            <h4>No projects yet</h4>
+                            <p>Create your first project using the form. It will appear here once saved.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    const projectSearch = document.getElementById("project-search");
+
+    if (projectSearch) {
+        projectSearch.addEventListener("input", function () {
+            const query = this.value.trim().toLowerCase();
+            const cards = Array.from(document.querySelectorAll(".project-card"));
+            let visibleCount = 0;
+
+            cards.forEach(function (card) {
+                const searchableText = card.dataset.search || "";
+                const matches = searchableText.includes(query);
+
+                card.style.display = matches ? "" : "none";
+
+                if (matches) {
+                    visibleCount++;
+                }
+            });
+
+            const results = document.getElementById("project-results");
+            const noResults = document.getElementById("no-search-results");
+
+            if (results) {
+                results.textContent = visibleCount +
+                    (visibleCount === 1 ? " project" : " projects");
+            }
+
+            if (noResults) {
+                noResults.style.display =
+                    visibleCount === 0 ? "block" : "none";
+            }
+        });
+    }
+
+    const deadlineInput = document.getElementById("project-deadline");
+
+    if (deadlineInput) {
+        const today = new Date();
+        const localDate = new Date(
+            today.getTime() - today.getTimezoneOffset() * 60000
+        ).toISOString().split("T")[0];
+
+        deadlineInput.min = localDate;
+    }
+</script>
+</body>
+</html>
+```

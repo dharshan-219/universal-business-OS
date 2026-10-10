@@ -1,0 +1,669 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employees | {{ business.name }}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .emp-page {
+            color: #172033;
+            --emp-primary: #7c3aed;
+            --emp-muted: #718096;
+        }
+
+        .emp-page * { box-sizing: border-box; }
+
+        .emp-hero {
+            padding: 30px;
+            margin-bottom: 25px;
+            border-radius: 20px;
+            color: white;
+            background: linear-gradient(120deg, #312e81, #7c3aed);
+        }
+
+        .emp-hero h2 {
+            margin: 0 0 10px;
+            font-size: clamp(24px, 3vw, 32px);
+            letter-spacing: -.5px;
+        }
+
+        .emp-hero p {
+            max-width: 600px;
+            margin: 0;
+            color: #ede9fe;
+            line-height: 1.7;
+        }
+
+        .emp-hero-tag {
+            display: inline-block;
+            margin-top: 18px;
+            padding: 8px 12px;
+            border: 1px solid rgba(255,255,255,.25);
+            border-radius: 9px;
+            background: rgba(255,255,255,.12);
+            font-size: 12px;
+        }
+
+        .emp-heading {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 26px 0 16px;
+        }
+
+        .emp-heading h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .emp-heading p {
+            margin: 6px 0 0;
+            color: var(--emp-muted);
+            font-size: 13px;
+        }
+
+        .emp-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 17px;
+            margin-bottom: 26px;
+        }
+
+        .emp-stat {
+            min-width: 0;
+            padding: 22px;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 5px 18px rgba(25,40,60,.035);
+        }
+
+        .emp-stat-icon {
+            display: grid;
+            place-items: center;
+            width: 43px;
+            height: 43px;
+            margin-bottom: 16px;
+            border-radius: 12px;
+            font-size: 20px;
+        }
+
+        .emp-purple { background: #ede9fe; }
+        .emp-blue { background: #e0f2fe; }
+        .emp-green { background: #dcfce7; }
+
+        .emp-stat-label {
+            color: #718096;
+            font-size: 13px;
+        }
+
+        .emp-stat-value {
+            margin-top: 9px;
+            font-size: clamp(22px, 2.4vw, 29px);
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .emp-stat-note {
+            margin-top: 7px;
+            color: #8a94a6;
+            font-size: 12px;
+        }
+
+        .emp-panel {
+            min-width: 0;
+            padding: 24px;
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+            background: white;
+            box-shadow: 0 5px 18px rgba(25,40,60,.035);
+        }
+
+        .emp-panel-head {
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+            margin-bottom: 8px;
+        }
+
+        .emp-panel-icon {
+            display: grid;
+            place-items: center;
+            width: 43px;
+            height: 43px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: #ede9fe;
+            font-size: 20px;
+        }
+
+        .emp-panel h2 {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .emp-muted {
+            margin: 6px 0 0;
+            color: var(--emp-muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .emp-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+            margin-top: 23px;
+        }
+
+        .emp-field label {
+            display: block;
+            margin-bottom: 7px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .emp-field input {
+            width: 100%;
+            min-height: 45px;
+            padding: 11px 12px;
+            border: 1px solid #dbe2ea;
+            border-radius: 10px;
+            background: white;
+            color: #172033;
+            font: inherit;
+            font-size: 13px;
+        }
+
+        .emp-field input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139,92,246,.12);
+        }
+
+        .emp-full { grid-column: 1 / -1; }
+
+        .emp-button {
+            width: 100%;
+            min-height: 46px;
+            padding: 13px 16px;
+            border: none;
+            border-radius: 10px;
+            background: #7c3aed;
+            color: white;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 750;
+            cursor: pointer;
+            transition: background .2s, transform .2s;
+        }
+
+        .emp-button:hover {
+            background: #6d28d9;
+            transform: translateY(-1px);
+        }
+
+        .emp-directory-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .emp-search {
+            width: min(100%, 330px);
+            min-height: 43px;
+            padding: 11px 13px;
+            border: 1px solid #dbe2ea;
+            border-radius: 10px;
+            font: inherit;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .emp-search:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139,92,246,.1);
+        }
+
+        .emp-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .emp-card {
+            min-width: 0;
+            padding: 20px;
+            border: 1px solid #e7eaf0;
+            border-radius: 15px;
+            background: #fff;
+            transition: border-color .2s, transform .2s;
+        }
+
+        .emp-card:hover {
+            border-color: #c4b5fd;
+            transform: translateY(-2px);
+        }
+
+        .emp-card-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+            margin-bottom: 17px;
+        }
+
+        .emp-avatar {
+            display: grid;
+            place-items: center;
+            width: 47px;
+            height: 47px;
+            flex-shrink: 0;
+            border-radius: 14px;
+            background: #ede9fe;
+            color: #6d28d9;
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        .emp-person {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .emp-person h3 {
+            margin: 2px 0 5px;
+            font-size: 16px;
+            overflow-wrap: anywhere;
+        }
+
+        .emp-role {
+            color: #718096;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .emp-status {
+            display: inline-block;
+            padding: 6px 9px;
+            border-radius: 20px;
+            background: #dcfce7;
+            color: #166534;
+            font-size: 11px;
+            font-weight: 750;
+            text-transform: capitalize;
+            white-space: nowrap;
+        }
+
+        .emp-status-other {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .emp-details {
+            display: grid;
+            gap: 11px;
+            padding-top: 15px;
+            border-top: 1px solid #eef0f4;
+        }
+
+        .emp-detail {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 12px;
+        }
+
+        .emp-detail-label { color: #718096; }
+
+        .emp-detail-value {
+            max-width: 65%;
+            color: #334155;
+            font-weight: 600;
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+
+        .emp-salary {
+            margin-top: 15px;
+            padding: 13px;
+            border-radius: 10px;
+            background: #f5f3ff;
+        }
+
+        .emp-salary-label {
+            color: #6d5a99;
+            font-size: 11px;
+        }
+
+        .emp-salary-value {
+            margin-top: 5px;
+            color: #5b21b6;
+            font-size: 20px;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .emp-empty {
+            grid-column: 1 / -1;
+            padding: 35px 15px;
+            text-align: center;
+            color: #718096;
+            line-height: 1.7;
+        }
+
+        .emp-empty-icon { font-size: 38px; }
+
+        .emp-empty h3 {
+            margin: 12px 0 6px;
+            color: #172033;
+        }
+
+        .emp-empty p {
+            margin: 5px 0;
+            font-size: 13px;
+        }
+
+        .emp-results {
+            margin: 14px 0 0;
+            color: #718096;
+            font-size: 12px;
+        }
+
+        [hidden] { display: none !important; }
+
+        @media (max-width: 1000px) {
+            .emp-list { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 750px) {
+            .emp-stats { grid-template-columns: 1fr; }
+            .emp-form { grid-template-columns: 1fr; }
+            .emp-full { grid-column: auto; }
+            .emp-panel { padding: 18px; }
+            .emp-hero { padding: 23px; }
+            .emp-search { width: 100%; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>Business OS</h2>
+            <p>{{ business.name }}</p>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('business_workspace', business_id=business.id) }}">📊 Dashboard</a>
+            <a href="{{ url_for('customers', business_id=business.id) }}">👥 Customers</a>
+            <a href="{{ url_for('products', business_id=business.id) }}">📦 Products</a>
+            <a href="{{ url_for('sales', business_id=business.id) }}">🛒 Sales</a>
+            <a href="{{ url_for('inventory', business_id=business.id) }}">📋 Inventory</a>
+            <a href="{{ url_for('purchases', business_id=business.id) }}">🚚 Purchases</a>
+            <a href="{{ url_for('finance', business_id=business.id) }}">💰 Finance</a>
+            <a class="active" href="{{ url_for('employees', business_id=business.id) }}">👨‍💼 Employees</a>
+            <a href="{{ url_for('projects', business_id=business.id) }}">📋 Projects</a>
+            <a href="{{ url_for('support', business_id=business.id) }}">🎧 Support</a>
+            <a href="{{ url_for('reports', business_id=business.id) }}">📈 Reports</a>
+            <a href="{{ url_for('business_settings', business_id=business.id) }}">⚙️ Settings</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('dashboard') }}">← My Businesses</a>
+            <a href="{{ url_for('logout') }}">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <main class="main emp-page">
+        <header class="topbar">
+            <div>
+                <h1>Employee Management</h1>
+                <p>People, roles, and payroll overview</p>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <section class="emp-hero">
+                <h2>Build a stronger team.</h2>
+                <p>Keep your employee information organized in one place. Add team members, review their roles, and see their recorded salary details.</p>
+                <span class="emp-hero-tag">👥 Team & HR workspace</span>
+            </section>
+
+            <div class="emp-heading">
+                <div>
+                    <h2>Team overview</h2>
+                    <p>A quick look at your employee records.</p>
+                </div>
+            </div>
+
+            <section class="emp-stats">
+                <article class="emp-stat">
+                    <div class="emp-stat-icon emp-purple">👥</div>
+                    <div class="emp-stat-label">Total employees</div>
+                    <div class="emp-stat-value">{{ employees|length }}</div>
+                    <div class="emp-stat-note">Employee records in this business</div>
+                </article>
+
+                <article class="emp-stat">
+                    <div class="emp-stat-icon emp-blue">💼</div>
+                    <div class="emp-stat-label">Different job roles</div>
+                    <div class="emp-stat-value">{{ employees|map(attribute='job_title')|unique|list|length }}</div>
+                    <div class="emp-stat-note">Unique job titles recorded</div>
+                </article>
+
+                <article class="emp-stat">
+                    <div class="emp-stat-icon emp-green">💰</div>
+                    <div class="emp-stat-label">Total recorded salaries</div>
+                    <div class="emp-stat-value">
+                        {{ business.currency }} {{ "%.2f"|format(employees|sum(attribute='salary')) }}
+                    </div>
+                    <div class="emp-stat-note">Sum of salary values, not a payroll payment record</div>
+                </article>
+            </section>
+
+            <div class="emp-heading">
+                <div>
+                    <h2>Add a team member</h2>
+                    <p>Enter the employee's details below.</p>
+                </div>
+            </div>
+
+            <section class="emp-panel">
+                <div class="emp-panel-head">
+                    <div class="emp-panel-icon">➕</div>
+                    <div>
+                        <h2>Employee registration</h2>
+                        <p class="emp-muted">Fields marked with * are required.</p>
+                    </div>
+                </div>
+
+                <form class="emp-form" method="POST"
+                      action="{{ url_for('add_employee', business_id=business.id) }}">
+
+                    <div class="emp-field">
+                        <label for="empName">Full name *</label>
+                        <input id="empName" type="text" name="name"
+                               placeholder="Enter employee full name" required>
+                    </div>
+
+                    <div class="emp-field">
+                        <label for="empRole">Job title / Role *</label>
+                        <input id="empRole" type="text" name="job_title"
+                               placeholder="e.g. Sales Executive" required>
+                    </div>
+
+                    <div class="emp-field">
+                        <label for="empEmail">Email address</label>
+                        <input id="empEmail" type="email" name="email"
+                               placeholder="employee@example.com">
+                    </div>
+
+                    <div class="emp-field">
+                        <label for="empPhone">Phone number</label>
+                        <input id="empPhone" type="tel" name="phone"
+                               placeholder="Enter phone number">
+                    </div>
+
+                    <div class="emp-field emp-full">
+                        <label for="empSalary">Salary ({{ business.currency }})</label>
+                        <input id="empSalary" type="number" name="salary"
+                               min="0" step="0.01" value="0"
+                               placeholder="Enter salary">
+                    </div>
+
+                    <div class="emp-full">
+                        <button class="emp-button" type="submit">＋ Add employee</button>
+                    </div>
+
+                </form>
+            </section>
+
+            <div class="emp-heading">
+                <div>
+                    <h2>Employee directory</h2>
+                    <p>Browse your team members and their recorded details.</p>
+                </div>
+            </div>
+
+            <section class="emp-panel">
+                <div class="emp-directory-head">
+                    <div>
+                        <h2>Team members</h2>
+                        <p class="emp-muted">Search by name, role, email, phone, or status.</p>
+                    </div>
+
+                    {% if employees %}
+                    <input id="employeeSearch" class="emp-search" type="search"
+                           placeholder="Search employees..."
+                           aria-label="Search employees">
+                    {% endif %}
+                </div>
+
+                <div class="emp-list" id="employeeList">
+                    {% if employees %}
+                        {% for employee in employees %}
+                        <article class="emp-card employee-row">
+                            <div class="emp-card-top">
+                                <div class="emp-avatar">
+                                    {{ employee.name[:1]|upper }}
+                                </div>
+
+                                <div class="emp-person">
+                                    <h3>{{ employee.name }}</h3>
+                                    <div class="emp-role">{{ employee.job_title }}</div>
+                                </div>
+
+                                {% if employee.status and employee.status|lower == 'active' %}
+                                    <span class="emp-status">{{ employee.status }}</span>
+                                {% else %}
+                                    <span class="emp-status emp-status-other">
+                                        {{ employee.status or "Not specified" }}
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <div class="emp-details">
+                                <div class="emp-detail">
+                                    <span class="emp-detail-label">Email</span>
+                                    <span class="emp-detail-value">
+                                        {{ employee.email or "Not provided" }}
+                                    </span>
+                                </div>
+
+                                <div class="emp-detail">
+                                    <span class="emp-detail-label">Phone</span>
+                                    <span class="emp-detail-value">
+                                        {{ employee.phone or "Not provided" }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="emp-salary">
+                                <div class="emp-salary-label">Recorded salary</div>
+                                <div class="emp-salary-value">
+                                    {{ business.currency }} {{ "%.2f"|format(employee.salary or 0) }}
+                                </div>
+                            </div>
+                        </article>
+                        {% endfor %}
+                    {% else %}
+                        <div class="emp-empty">
+                            <div class="emp-empty-icon">👥</div>
+                            <h3>Your team starts here</h3>
+                            <p>No employees have been added yet.</p>
+                            <p>Use the employee registration form above to add your first team member.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if employees %}
+                <p id="employeeResults" class="emp-results">
+                    Showing {{ employees|length }} employee(s).
+                </p>
+
+                <div id="employeeNoResults" class="emp-empty" hidden>
+                    <div class="emp-empty-icon">🔎</div>
+                    <h3>No matching employees</h3>
+                    <p>Try a different name, job title, email, or phone number.</p>
+                </div>
+                {% endif %}
+            </section>
+
+        </section>
+    </main>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    const search = document.getElementById("employeeSearch");
+    const list = document.getElementById("employeeList");
+    const results = document.getElementById("employeeResults");
+    const noResults = document.getElementById("employeeNoResults");
+
+    if (!search || !list) return;
+
+    const rows = Array.from(list.querySelectorAll(".employee-row"));
+    const total = rows.length;
+
+    search.addEventListener("input", function () {
+        const query = search.value.trim().toLowerCase();
+        let visible = 0;
+
+        rows.forEach(function (row) {
+            const matches = row.textContent.toLowerCase().includes(query);
+            row.hidden = !matches;
+            if (matches) visible++;
+        });
+
+        if (results) {
+            results.textContent =
+                "Showing " + visible + " of " + total + " employee(s).";
+            results.hidden = visible === 0;
+        }
+
+        if (noResults) {
+            noResults.hidden = visible !== 0;
+        }
+    });
+})();
+</script>
+
+</body>
+</html>
+```

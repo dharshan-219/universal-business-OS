@@ -1,0 +1,538 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Business OS | One Platform, Every Workflow</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        :root {
+            --navy: #0b1020;
+            --purple: #7968fa;
+            --muted: #aab2c9;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: #0b1020;
+            color: white;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        .navbar {
+            max-width: 1200px;
+            margin: auto;
+            padding: 22px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            font-weight: 800;
+            font-size: 16px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            border: 1px solid #ffffff30;
+            background: #ffffff10;
+            font-size: 23px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            font-size: 13px;
+            font-weight: 650;
+        }
+
+        .nav-login { color: #d0d4e5; }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 46px;
+            padding: 0 20px;
+            border-radius: 11px;
+            background: linear-gradient(110deg, #6557e8, #9680ff);
+            color: white;
+            font-size: 13px;
+            font-weight: 750;
+            box-shadow: 0 8px 28px #7968fa30;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px #7968fa4a;
+        }
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            max-width: 1200px;
+            margin: auto;
+            padding: 100px 28px 95px;
+            text-align: center;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            z-index: 0;
+            width: 650px;
+            height: 500px;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: radial-gradient(ellipse, #6e5cfb2d, transparent 68%);
+            pointer-events: none;
+        }
+
+        .hero > * { position: relative; z-index: 1; }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 9px 14px;
+            border: 1px solid #ffffff18;
+            border-radius: 999px;
+            background: #ffffff08;
+            color: #c7c0ff;
+            font-size: 11px;
+            font-weight: 750;
+            letter-spacing: 1.3px;
+            text-transform: uppercase;
+        }
+
+        .eyebrow span {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #a99aff;
+            box-shadow: 0 0 12px #a99aff;
+        }
+
+        .hero h1 {
+            max-width: 900px;
+            margin: 30px auto 22px;
+            font-size: clamp(42px, 7vw, 76px);
+            line-height: 1.07;
+            letter-spacing: -3.5px;
+        }
+
+        .gradient-text {
+            color: #a99aff;
+            background: linear-gradient(100deg, #b6aaff, #8cc8ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            max-width: 620px;
+            margin: 0 auto;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.9;
+        }
+
+        .hero-actions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 35px;
+        }
+
+        .button-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 46px;
+            padding: 0 20px;
+            border: 1px solid #ffffff27;
+            border-radius: 11px;
+            color: #e3e5f0;
+            font-size: 13px;
+            font-weight: 700;
+            transition: background .2s;
+        }
+
+        .button-secondary:hover { background: #ffffff0d; }
+
+        .preview {
+            max-width: 940px;
+            margin: 0 auto;
+            padding: 0 22px;
+        }
+
+        .dashboard {
+            padding: 13px;
+            border: 1px solid #ffffff20;
+            border-radius: 19px;
+            background: linear-gradient(145deg, #ffffff10, #ffffff04);
+            box-shadow: 0 30px 100px #00000045;
+        }
+
+        .dashboard-inner {
+            min-height: 240px;
+            display: grid;
+            grid-template-columns: 155px 1fr;
+            overflow: hidden;
+            border: 1px solid #ffffff0c;
+            border-radius: 12px;
+            background: #11182b;
+        }
+
+        .mock-sidebar {
+            padding: 22px 12px;
+            border-right: 1px solid #ffffff10;
+        }
+
+        .mock-logo {
+            height: 10px;
+            width: 85px;
+            border-radius: 10px;
+            background: #a99aff;
+            margin: 3px 0 28px;
+        }
+
+        .mock-link {
+            height: 9px;
+            width: 85%;
+            margin: 18px 0;
+            border-radius: 10px;
+            background: #ffffff19;
+        }
+
+        .mock-link.active { background: #7968fa; }
+
+        .mock-main { padding: 24px; }
+
+        .mock-heading {
+            width: 180px;
+            max-width: 70%;
+            height: 14px;
+            border-radius: 10px;
+            background: #ffffffc9;
+            margin-bottom: 8px;
+        }
+
+        .mock-subheading {
+            width: 230px;
+            max-width: 90%;
+            height: 7px;
+            border-radius: 10px;
+            background: #ffffff25;
+            margin-bottom: 25px;
+        }
+
+        .mock-cards {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .mock-card {
+            min-height: 95px;
+            padding: 15px;
+            border: 1px solid #ffffff12;
+            border-radius: 10px;
+            background: #ffffff06;
+        }
+
+        .mock-card-label {
+            width: 65%;
+            height: 7px;
+            border-radius: 10px;
+            background: #ffffff45;
+        }
+
+        .mock-card-value {
+            width: 80%;
+            height: 16px;
+            margin-top: 18px;
+            border-radius: 5px;
+            background: #b3a6ff;
+        }
+
+        .features {
+            padding: 85px 28px 95px;
+            background: #f7f8fc;
+            color: #182033;
+        }
+
+        .features-inner { max-width: 1100px; margin: auto; }
+
+        .section-heading { text-align: center; margin-bottom: 42px; }
+
+        .section-heading .eyebrow {
+            background: #7667f810;
+            border-color: #7667f825;
+            color: #6557e8;
+        }
+
+        .section-heading h2 {
+            margin: 18px 0 12px;
+            font-size: clamp(29px, 4vw, 42px);
+            letter-spacing: -1.5px;
+        }
+
+        .section-heading p {
+            color: #737d93;
+            line-height: 1.8;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .feature-card {
+            padding: 25px;
+            border: 1px solid #e7e9f2;
+            border-radius: 17px;
+            background: white;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px #1720440b;
+        }
+
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: #7667f812;
+            color: #6557e8;
+            font-size: 20px;
+        }
+
+        .feature-card h3 { margin: 19px 0 9px; font-size: 16px; }
+
+        .feature-card p {
+            margin: 0;
+            color: #737d93;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .cta {
+            margin: 0;
+            padding: 75px 25px;
+            text-align: center;
+            background: linear-gradient(130deg, #171b3d, #252057);
+        }
+
+        .cta h2 {
+            margin: 0 0 15px;
+            font-size: clamp(30px, 4vw, 43px);
+            letter-spacing: -1.4px;
+        }
+
+        .cta p { color: #bbc1d7; line-height: 1.8; margin-bottom: 25px; }
+
+        footer {
+            padding: 24px;
+            text-align: center;
+            color: #969fb8;
+            font-size: 12px;
+            border-top: 1px solid #ffffff12;
+        }
+
+        @media (max-width: 700px) {
+            .navbar { padding: 17px 18px; }
+            .brand { font-size: 13px; }
+            .brand-icon { width: 36px; height: 36px; }
+            .nav-actions { gap: 13px; font-size: 12px; }
+            .nav-actions .button { min-height: 39px; padding: 0 12px; }
+            .hero { padding: 75px 20px 65px; }
+            .hero h1 { letter-spacing: -2px; }
+            .hero p { font-size: 14px; }
+            .dashboard-inner { grid-template-columns: 80px 1fr; min-height: 210px; }
+            .mock-sidebar { padding: 17px 8px; }
+            .mock-link { width: 90%; }
+            .mock-main { padding: 15px 10px; }
+            .mock-cards { gap: 6px; }
+            .mock-card { min-height: 75px; padding: 9px 6px; }
+            .mock-card-value { width: 90%; height: 12px; }
+            .features { padding: 65px 18px; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .feature-card { padding: 21px; }
+        }
+
+        @media (max-width: 390px) {
+            .brand { font-size: 11px; }
+            .nav-actions { gap: 9px; }
+            .nav-actions .button { padding: 0 9px; }
+            .eyebrow { font-size: 9px; letter-spacing: .8px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                transition-duration: .01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<nav class="navbar">
+    <a href="{{ url_for('home') }}" class="brand">
+        <span class="brand-icon">✳</span>
+        <span>Universal Business OS</span>
+    </a>
+
+    <div class="nav-actions">
+        <a class="nav-login" href="{{ url_for('login') }}">Log in</a>
+        <a class="button" href="{{ url_for('register') }}">Get started ↗</a>
+    </div>
+</nav>
+
+    <main>
+        <section class="hero">
+            <div class="eyebrow"><span></span> THE OPERATING SYSTEM FOR YOUR BUSINESS</div>
+
+            <h1>
+                Every part of your business.<br>
+                <span class="gradient-text">One clear picture.</span>
+            </h1>
+
+            <p>
+                From customers and sales to inventory, finance and projects,
+                bring your daily workflow together in one organized workspace.
+                Spend less time switching between tools and more time moving forward.
+            </p>
+
+            <div class="hero-actions">
+                <a class="button" href="{{ url_for('register') }}">
+                    Create your workspace&nbsp; →
+                </a>
+                <a class="button-secondary" href="{{ url_for('login') }}">
+                    Explore your workspace&nbsp; ↗
+                </a>
+            </div>
+        </section>
+
+        <section class="preview" aria-label="Illustration of the business dashboard">
+            <div class="dashboard">
+                <div class="dashboard-inner">
+                    <div class="mock-sidebar">
+                        <div class="mock-logo"></div>
+                        <div class="mock-link active"></div>
+                        <div class="mock-link"></div>
+                        <div class="mock-link"></div>
+                        <div class="mock-link"></div>
+                        <div class="mock-link"></div>
+                    </div>
+
+                    <div class="mock-main">
+                        <div class="mock-heading"></div>
+                        <div class="mock-subheading"></div>
+
+                        <div class="mock-cards">
+                            <div class="mock-card">
+                                <div class="mock-card-label"></div>
+                                <div class="mock-card-value"></div>
+                            </div>
+                            <div class="mock-card">
+                                <div class="mock-card-label"></div>
+                                <div class="mock-card-value"></div>
+                            </div>
+                            <div class="mock-card">
+                                <div class="mock-card-label"></div>
+                                <div class="mock-card-value"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="features-inner">
+                <div class="section-heading">
+                    <div class="eyebrow">BUILT FOR YOUR WORKFLOW</div>
+                    <h2>Everything connected.<br>Nothing scattered.</h2>
+                    <p>One place to understand and manage the moving parts of your business.</p>
+                </div>
+
+                <div class="feature-grid">
+                    <article class="feature-card">
+                        <div class="feature-icon">◈</div>
+                        <h3>Customer relationships</h3>
+                        <p>Keep customer details and business interactions organized in one place.</p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">▤</div>
+                        <h3>Sales & inventory</h3>
+                        <p>Manage products, purchases, sales and stock with a clearer workflow.</p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">↗</div>
+                        <h3>Finance & insights</h3>
+                        <p>Review revenue, spending and business reports to support better decisions.</p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">◎</div>
+                        <h3>Team management</h3>
+                        <p>Organize employee information and keep important details accessible.</p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">◇</div>
+                        <h3>Project tracking</h3>
+                        <p>Track projects, deadlines, budgets and progress from your workspace.</p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">✳</div>
+                        <h3>A unified workspace</h3>
+                        <p>Bring essential business activities together in one consistent interface.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta">
+            <h2>Give your business a clearer direction.</h2>
+            <p>Create your account and start organizing your workflow.</p>
+            <a class="button" href="{{ url_for('register') }}">Get started for your business →</a>
+        </section>
+    </main>
+
+    <footer>
+        Universal Business OS · One workspace. Many possibilities.
+    </footer>
+</body>
+</html>

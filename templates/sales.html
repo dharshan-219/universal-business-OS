@@ -1,0 +1,814 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales | {{ business.name }}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .sales-page {
+            --s-green: #087443;
+            --s-dark: #075b37;
+            --s-soft: #e8f7ee;
+            --s-border: #e2ebe6;
+        }
+
+        .s-hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 30px;
+            margin-bottom: 24px;
+            border-radius: 18px;
+            color: white;
+            background: linear-gradient(115deg, #102f28, #075b37 68%, #15945e);
+        }
+
+        .s-hero-label {
+            color: #a9eac7;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+        }
+
+        .s-hero h2 {
+            margin: 12px 0 9px;
+            color: white;
+            font-size: clamp(24px, 3vw, 32px);
+        }
+
+        .s-hero p {
+            max-width: 510px;
+            margin: 0;
+            color: #d4e9dc;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .s-hero-icon {
+            display: grid;
+            place-items: center;
+            width: 75px;
+            height: 75px;
+            flex-shrink: 0;
+            border: 1px solid #ffffff35;
+            border-radius: 22px;
+            background: #ffffff12;
+            font-size: 32px;
+        }
+
+        .s-flash {
+            margin-bottom: 12px;
+            padding: 13px 15px;
+            border: 1px solid #bce8cb;
+            border-radius: 10px;
+            background: #edfbf1;
+            color: #176b3c;
+            font-size: 13px;
+        }
+
+        .s-flash.error {
+            border-color: #fecaca;
+            background: #fff1f2;
+            color: #b42335;
+        }
+
+        .s-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 26px 0 15px;
+        }
+
+        .s-heading h2 {
+            margin: 0 0 5px;
+            font-size: 18px;
+        }
+
+        .s-heading p {
+            margin: 0;
+            color: #8490a0;
+            font-size: 12px;
+        }
+
+        .s-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 15px;
+            margin-bottom: 24px;
+        }
+
+        .s-stat {
+            padding: 20px;
+            border: 1px solid var(--s-border);
+            border-radius: 15px;
+            background: white;
+        }
+
+        .s-stat-icon {
+            display: grid;
+            place-items: center;
+            width: 40px;
+            height: 40px;
+            margin-bottom: 16px;
+            border-radius: 12px;
+            background: var(--s-soft);
+            font-size: 18px;
+        }
+
+        .s-stat-icon.blue { background: #eaf1ff; }
+        .s-stat-icon.gold { background: #fff4dc; }
+
+        .s-stat-label {
+            color: #839184;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .7px;
+            text-transform: uppercase;
+        }
+
+        .s-stat h3 {
+            margin: 7px 0 5px;
+            color: #17352a;
+            font-size: clamp(20px, 2.3vw, 27px);
+            overflow-wrap: anywhere;
+        }
+
+        .s-stat p {
+            margin: 0;
+            color: #8a978f;
+            font-size: 11px;
+        }
+
+        .s-layout {
+            display: grid;
+            grid-template-columns: minmax(260px, .78fr) minmax(0, 1.5fr);
+            align-items: start;
+            gap: 20px;
+        }
+
+        .sales-page .section {
+            min-width: 0;
+            padding: 23px;
+        }
+
+        .s-panel-heading {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 21px;
+        }
+
+        .s-panel-icon {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: var(--s-soft);
+            color: var(--s-dark);
+            font-size: 20px;
+        }
+
+        .s-panel-heading h2 {
+            margin: 0 0 5px;
+            font-size: 17px;
+        }
+
+        .s-panel-heading p {
+            margin: 0;
+            color: #8490a0;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .s-form label {
+            display: block;
+            margin: 16px 0 7px;
+            color: #344458;
+            font-size: 12px;
+            font-weight: 750;
+        }
+
+        .s-form select,
+        .s-form input {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            min-height: 44px;
+            padding: 11px;
+            border: 1px solid #dce7e0;
+            border-radius: 9px;
+            outline: none;
+            background: #fcfefd;
+            color: #243a30;
+            font: inherit;
+            font-size: 12px;
+        }
+
+        .s-form select:focus,
+        .s-form input:focus {
+            border-color: var(--s-green);
+            box-shadow: 0 0 0 3px #08744317;
+        }
+
+        .s-help {
+            margin: 7px 0 0;
+            color: #85938a;
+            font-size: 10px;
+            line-height: 1.6;
+        }
+
+        .s-save {
+            width: 100%;
+            min-height: 46px;
+            margin-top: 21px;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(100deg, #087443, #15945e);
+            color: white;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform .2s;
+        }
+
+        .s-save:hover {
+            transform: translateY(-2px);
+        }
+
+        .s-notice {
+            padding: 13px;
+            border: 1px solid #e2ebe6;
+            border-radius: 10px;
+            background: #f7faf8;
+            color: #68796e;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .s-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .s-links a {
+            display: inline-flex;
+            padding: 10px 12px;
+            border: 1px solid #dfe9e3;
+            border-radius: 9px;
+            color: #426151;
+            background: white;
+            font-size: 11px;
+            font-weight: 750;
+        }
+
+        .s-links a:hover {
+            background: #f1faf4;
+            border-color: #a9d9b9;
+        }
+
+        .s-tools {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .s-count {
+            padding: 7px 10px;
+            border-radius: 8px;
+            background: var(--s-soft);
+            color: var(--s-dark);
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .s-search {
+            width: 100%;
+            max-width: 230px;
+            min-height: 39px;
+            padding: 9px 11px;
+            border: 1px solid #dfe8e2;
+            border-radius: 9px;
+            outline: none;
+            background: #fcfefd;
+            font: inherit;
+            font-size: 12px;
+        }
+
+        .s-search:focus {
+            border-color: var(--s-green);
+            box-shadow: 0 0 0 3px #08744317;
+        }
+
+        .s-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #e7eee9;
+            border-radius: 11px;
+        }
+
+        .s-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .s-table th {
+            padding: 13px 12px;
+            background: #f4f8f5;
+            color: #77877d;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .s-table td {
+            padding: 14px 12px;
+            border-top: 1px solid #edf2ee;
+            color: #58695e;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+        .s-table tbody tr:hover { background: #f8fcf9; }
+        .s-table tbody tr[hidden] { display: none; }
+        .s-empty-row[hidden] { display: none; }
+
+        .s-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 140px;
+        }
+
+        .s-item-icon {
+            display: grid;
+            place-items: center;
+            width: 37px;
+            height: 37px;
+            flex-shrink: 0;
+            border-radius: 11px;
+            background: var(--s-soft);
+            font-size: 17px;
+        }
+
+        .s-item strong {
+            display: block;
+            color: #203b2c;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .s-item small {
+            display: block;
+            margin-top: 4px;
+            color: #8a978e;
+            font-size: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .s-total {
+            color: #146b3d;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .s-qty {
+            display: inline-block;
+            padding: 5px 8px;
+            border-radius: 7px;
+            background: #eef5f0;
+            color: #476553;
+            font-size: 11px;
+            font-weight: 750;
+            white-space: nowrap;
+        }
+
+        .s-empty {
+            padding: 32px 15px;
+            text-align: center;
+        }
+
+        .s-empty-icon {
+            display: grid;
+            place-items: center;
+            width: 55px;
+            height: 55px;
+            margin: 0 auto 14px;
+            border-radius: 16px;
+            background: var(--s-soft);
+            font-size: 25px;
+        }
+
+        .s-empty h3 {
+            margin: 0 0 7px;
+            font-size: 15px;
+        }
+
+        .s-empty p {
+            margin: 0;
+            color: #8490a0;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 1100px) {
+            .s-layout {
+                grid-template-columns: minmax(250px, .8fr) minmax(0, 1.2fr);
+            }
+        }
+
+        @media (max-width: 850px) {
+            .s-layout { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 700px) {
+            .s-hero { padding: 23px 20px; }
+            .s-hero-icon {
+                width: 56px;
+                height: 56px;
+                font-size: 25px;
+            }
+            .s-stats { gap: 10px; }
+            .s-stat { padding: 14px; }
+            .sales-page .section { padding: 16px; }
+            .s-tools { align-items: stretch; }
+            .s-search { max-width: none; }
+        }
+
+        @media (max-width: 440px) {
+            .s-stats { grid-template-columns: 1fr; }
+            .s-stat {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+            }
+            .s-stat-icon {
+                width: 43px;
+                height: 43px;
+                flex-shrink: 0;
+                margin: 0;
+            }
+            .s-hero-icon { display: none; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>Business OS</h2>
+            <p>{{ business.name }}</p>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('business_workspace', business_id=business.id) }}">📊 Dashboard</a>
+            <a href="{{ url_for('customers', business_id=business.id) }}">👥 Customers</a>
+            <a href="{{ url_for('products', business_id=business.id) }}">📦 Products</a>
+            <a href="{{ url_for('sales', business_id=business.id) }}" class="active">🛒 Sales</a>
+            <a href="{{ url_for('inventory', business_id=business.id) }}">📋 Inventory</a>
+            <a href="{{ url_for('purchases', business_id=business.id) }}">🚚 Purchases</a>
+            <a href="{{ url_for('finance', business_id=business.id) }}">💰 Finance</a>
+            <a href="{{ url_for('employees', business_id=business.id) }}">👨‍💼 Employees</a>
+            <a href="{{ url_for('projects', business_id=business.id) }}">📋 Projects</a>
+            <a href="{{ url_for('support', business_id=business.id) }}">🎧 Support</a>
+            <a href="{{ url_for('reports', business_id=business.id) }}">📈 Reports</a>
+            <a href="{{ url_for('business_settings', business_id=business.id) }}">⚙️ Settings</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('dashboard') }}">← My Businesses</a>
+            <a href="{{ url_for('logout') }}">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <main class="main sales-page">
+        <header class="topbar">
+            <div>
+                <h1>Sales & Transactions</h1>
+                <p>Record customer sales and review transaction history.</p>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <div class="s-hero">
+                <div>
+                    <span class="s-hero-label">SALES MANAGEMENT</span>
+                    <h2>Every sale, clearly recorded.</h2>
+                    <p>
+                        Create sales with your customers and products,
+                        review recorded transactions, and keep your business organized.
+                    </p>
+                </div>
+                <div class="s-hero-icon" aria-hidden="true">↗</div>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <div class="s-flash{% if category in ['error', 'danger'] %} error{% endif %}"
+                         role="status">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endwith %}
+
+            <div class="s-heading">
+                <div>
+                    <h2>Sales overview</h2>
+                    <p>Summary of the transactions currently loaded.</p>
+                </div>
+            </div>
+
+            <div class="s-stats">
+                <div class="s-stat">
+                    <div class="s-stat-icon">🧾</div>
+                    <div class="s-stat-label">Recorded sales</div>
+                    <h3>{{ sales|length }}</h3>
+                    <p>Transactions in this history</p>
+                </div>
+
+                <div class="s-stat">
+                    <div class="s-stat-icon blue">↗</div>
+                    <div class="s-stat-label">Sales value</div>
+                    <h3>{{ business.currency }} {{ '%.2f'|format(sales|sum(attribute='total_amount')) }}</h3>
+                    <p>Sum of recorded transaction totals</p>
+                </div>
+
+                <div class="s-stat">
+                    <div class="s-stat-icon gold">📦</div>
+                    <div class="s-stat-label">Units sold</div>
+                    <h3>{{ sales|sum(attribute='quantity') }}</h3>
+                    <p>Combined recorded quantities</p>
+                </div>
+            </div>
+
+            <div class="s-layout">
+
+                <!-- CREATE SALE -->
+                <section class="section">
+                    <div class="s-panel-heading">
+                        <div class="s-panel-icon">＋</div>
+                        <div>
+                            <h2>Create a sale</h2>
+                            <p>Choose a customer, product and quantity.</p>
+                        </div>
+                    </div>
+
+                    {% if customers and products %}
+                        <form class="s-form"
+                              method="POST"
+                              action="{{ url_for('add_sale', business_id=business.id) }}">
+
+                            <label for="customer_id">Customer *</label>
+                            <select id="customer_id" name="customer_id" required>
+                                <option value="">Choose a customer</option>
+                                {% for customer in customers %}
+                                    <option value="{{ customer.id }}">
+                                        {{ customer.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+                            <label for="product_id">Product or service *</label>
+                            <select id="product_id" name="product_id" required>
+                                <option value="">Choose a product</option>
+                                {% for product in products %}
+                                    <option value="{{ product.id }}"
+                                            data-price="{{ product.selling_price }}">
+                                        {{ product.name }} —
+                                        {{ business.currency }} {{ '%.2f'|format(product.selling_price) }}
+                                        (Stock: {{ product.stock_quantity }} {{ product.unit }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+                            <label for="quantity">Quantity *</label>
+                            <input type="number"
+                                   id="quantity"
+                                   name="quantity"
+                                   min="0.01"
+                                   step="0.01"
+                                   placeholder="Enter quantity"
+                                   required>
+
+                            <p class="s-help">
+                                Select a product and enter a quantity to preview the total.
+                            </p>
+
+                            <div id="salePreview"
+                                 data-currency="{{ business.currency }}"
+                                 class="s-notice"
+                                 style="margin-top: 14px;"
+                                 aria-live="polite">
+                                Select a product and quantity to preview the sale total.
+                            </div>
+
+                            <button class="s-save" type="submit">
+                                ✓ &nbsp; Save sale
+                            </button>
+                        </form>
+                    {% else %}
+                        <div class="s-notice">
+                            You need at least one customer and one product before creating a sale.
+                        </div>
+
+                        <div class="s-links">
+                            {% if not customers %}
+                                <a href="{{ url_for('customers', business_id=business.id) }}">+ Add customer</a>
+                            {% endif %}
+                            {% if not products %}
+                                <a href="{{ url_for('products', business_id=business.id) }}">+ Add product</a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </section>
+
+                <!-- SALES HISTORY -->
+                <section class="section">
+                    <div class="s-panel-heading">
+                        <div class="s-panel-icon">▤</div>
+                        <div>
+                            <h2>Transaction history</h2>
+                            <p>Review customers, items sold, quantities and totals.</p>
+                        </div>
+                    </div>
+
+                    <div class="s-tools">
+                        <span class="s-count">{{ sales|length }} transactions</span>
+                        <input class="s-search"
+                               id="salesSearch"
+                               type="search"
+                               placeholder="Search transactions..."
+                               aria-label="Search sales history">
+                    </div>
+
+                    {% if sales %}
+                        <div class="s-table-wrap">
+                            <table class="s-table">
+                                <thead>
+                                    <tr>
+                                        <th>Product / Customer</th>
+                                        <th>Quantity</th>
+                                        <th>Sale total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salesTableBody">
+                                    {% for sale in sales %}
+                                        <tr class="s-sale-row">
+                                            <td>
+                                                <div class="s-item">
+                                                    <div class="s-item-icon">🧾</div>
+                                                    <div>
+                                                        <strong>{{ sale.product.name }}</strong>
+                                                        <small>{{ sale.customer.name }}</small>
+                                                        <small>
+                                                            Unit price:
+                                                            {{ business.currency }}
+                                                            {{ '%.2f'|format(sale.unit_price) }}
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="s-qty">{{ sale.quantity }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="s-total">
+                                                    {{ business.currency }}
+                                                    {{ '%.2f'|format(sale.total_amount) }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+
+                                    <tr id="salesNoResults" class="s-empty-row" hidden>
+                                        <td colspan="3">
+                                            <div class="s-empty">
+                                                <div class="s-empty-icon">⌕</div>
+                                                <h3>No matching transactions</h3>
+                                                <p>Try a different customer or product name.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="s-empty">
+                            <div class="s-empty-icon">🧾</div>
+                            <h3>No sales recorded yet</h3>
+                            <p>Your sales history will appear here after you save your first transaction.</p>
+                        </div>
+                    {% endif %}
+                </section>
+
+            </div>
+
+            <div class="s-heading">
+                <div>
+                    <h2>Related operations</h2>
+                    <p>Continue managing your business.</p>
+                </div>
+            </div>
+
+            <section class="section">
+                <div class="s-links">
+                    <a href="{{ url_for('customers', business_id=business.id) }}">👥 Customers</a>
+                    <a href="{{ url_for('products', business_id=business.id) }}">📦 Products</a>
+                    <a href="{{ url_for('inventory', business_id=business.id) }}">📋 Inventory</a>
+                    <a href="{{ url_for('finance', business_id=business.id) }}">💰 Finance</a>
+                </div>
+            </section>
+
+        </section>
+    </main>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    // Search transactions by product, customer or price.
+    const search = document.getElementById("salesSearch");
+    const tbody = document.getElementById("salesTableBody");
+    const noResults = document.getElementById("salesNoResults");
+
+    if (search && tbody) {
+        search.addEventListener("input", function () {
+            const query = search.value.trim().toLowerCase();
+            const rows = tbody.querySelectorAll(".s-sale-row");
+            let visibleCount = 0;
+
+            rows.forEach(function (row) {
+                const matches = row.textContent.toLowerCase().includes(query);
+                row.hidden = !matches;
+
+                if (matches) {
+                    visibleCount++;
+                }
+            });
+
+            if (noResults) {
+                noResults.hidden = visibleCount !== 0;
+            }
+        });
+    }
+
+    // Preview the sale total without changing or saving database data.
+    const productSelect = document.getElementById("product_id");
+    const quantityInput = document.getElementById("quantity");
+    const preview = document.getElementById("salePreview");
+
+    if (productSelect && quantityInput && preview) {
+        const currency = preview.getAttribute("data-currency") || "";
+
+        function updatePreview() {
+            const option = productSelect.options[productSelect.selectedIndex];
+            const price = Number(option ? option.getAttribute("data-price") : NaN);
+            const quantity = Number(quantityInput.value);
+
+            if (
+                !option ||
+                !option.value ||
+                !Number.isFinite(price) ||
+                quantityInput.value.trim() === "" ||
+                !Number.isFinite(quantity) ||
+                quantity <= 0
+            ) {
+                preview.textContent =
+                    "Select a product and enter a valid quantity to preview the sale total.";
+                return;
+            }
+
+            const total = price * quantity;
+
+            preview.textContent =
+                "Estimated total: " + currency + " " + total.toFixed(2);
+        }
+
+        productSelect.addEventListener("change", updatePreview);
+        quantityInput.addEventListener("input", updatePreview);
+    }
+})();
+</script>
+
+</body>
+</html>

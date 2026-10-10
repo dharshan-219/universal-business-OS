@@ -1,0 +1,693 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports | Business OS</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6fb;
+            color: #172033;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .report-page {
+            padding: 28px;
+            max-width: 1500px;
+            margin: auto;
+        }
+
+        .report-hero {
+            padding: 30px;
+            border-radius: 22px;
+            background: linear-gradient(120deg, #172554, #4338ca, #6366f1);
+            color: white;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .report-hero h1 {
+            margin: 0 0 10px;
+            font-size: 30px;
+        }
+
+        .report-hero p {
+            margin: 0;
+            color: #e0e7ff;
+            line-height: 1.6;
+        }
+
+        .report-button {
+            border: none;
+            border-radius: 10px;
+            padding: 12px 18px;
+            background: white;
+            color: #3730a3;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .report-stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .report-stat {
+            background: white;
+            padding: 22px;
+            border: 1px solid #e8ebf3;
+            border-radius: 17px;
+            box-shadow: 0 5px 20px rgba(28, 39, 76, 0.04);
+        }
+
+        .report-stat .stat-label {
+            color: #748096;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .report-stat .stat-value {
+            font-size: 27px;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .report-stat .stat-note {
+            font-size: 12px;
+            color: #9099aa;
+            margin-top: 8px;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .report-card {
+            background: white;
+            border: 1px solid #e8ebf3;
+            border-radius: 18px;
+            padding: 24px;
+            min-width: 0;
+            box-shadow: 0 5px 20px rgba(28, 39, 76, 0.04);
+        }
+
+        .report-card h2 {
+            font-size: 18px;
+            margin: 0 0 7px;
+        }
+
+        .report-card .card-description {
+            color: #8992a5;
+            font-size: 13px;
+            margin: 0 0 22px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 310px;
+            width: 100%;
+        }
+
+        .report-details {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .detail-item {
+            border: 1px solid #edf0f6;
+            border-radius: 13px;
+            padding: 19px;
+            background: #fbfcff;
+        }
+
+        .detail-item span {
+            display: block;
+            color: #748096;
+            font-size: 13px;
+            margin-bottom: 9px;
+        }
+
+        .detail-item strong {
+            display: block;
+            font-size: 22px;
+            overflow-wrap: anywhere;
+        }
+
+        .balance-card {
+            background: #eef2ff;
+            border-color: #dbe3ff;
+        }
+
+        .balance-card strong {
+            color: #4338ca;
+        }
+
+        .report-footer {
+            color: #929bad;
+            font-size: 12px;
+            text-align: center;
+            padding: 12px;
+        }
+
+        .chart-error {
+            display: none;
+            color: #b91c1c;
+            background: #fef2f2;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 1050px) {
+            .report-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .report-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .report-page {
+                padding: 14px;
+            }
+
+            .report-hero {
+                padding: 22px;
+            }
+
+            .report-hero h1 {
+                font-size: 24px;
+            }
+
+            .report-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .report-details {
+                grid-template-columns: 1fr;
+            }
+
+            .report-stat .stat-value {
+                font-size: 24px;
+            }
+
+            .report-card {
+                padding: 18px;
+            }
+
+            .chart-container {
+                height: 260px;
+            }
+        }
+
+        @media print {
+            .sidebar,
+            .topbar,
+            .report-button,
+            .sidebar-bottom {
+                display: none !important;
+            }
+
+            .app,
+            .main {
+                display: block !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            body {
+                background: white;
+            }
+
+            .report-page {
+                max-width: none;
+                padding: 10px;
+            }
+
+            .report-hero {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .report-card,
+            .report-stat {
+                break-inside: avoid;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo">Business OS</div>
+
+        <nav>
+            <a href="{{ url_for('business_workspace', business_id=business.id) }}">📊 Dashboard</a>
+            <a href="{{ url_for('customers', business_id=business.id) }}">👥 Customers</a>
+            <a href="{{ url_for('products', business_id=business.id) }}">📦 Products</a>
+            <a href="{{ url_for('sales', business_id=business.id) }}">🛒 Sales</a>
+            <a href="{{ url_for('inventory', business_id=business.id) }}">📋 Inventory</a>
+            <a href="{{ url_for('purchases', business_id=business.id) }}">🚚 Purchases</a>
+            <a href="{{ url_for('finance', business_id=business.id) }}">💰 Finance</a>
+            <a href="{{ url_for('employees', business_id=business.id) }}">👨‍💼 Employees</a>
+            <a href="{{ url_for('projects', business_id=business.id) }}">📁 Projects</a>
+            <a href="{{ url_for('support', business_id=business.id) }}">🎧 Support</a>
+            <a href="{{ url_for('reports', business_id=business.id) }}" class="active">📈 Reports</a>
+            <a href="{{ url_for('business_settings', business_id=business.id) }}">⚙️ Settings</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('dashboard') }}">← My Businesses</a>
+            <a href="{{ url_for('logout') }}">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+        <header class="topbar">
+            <div>
+                <strong>{{ business.name }}</strong>
+            </div>
+            <div>Business Reports</div>
+        </header>
+
+        <section class="report-page">
+
+            <!-- HERO -->
+            <div class="report-hero">
+                <div>
+                    <h1>Business Reports 📈</h1>
+                    <p>
+                        Understand your business performance, financial activity
+                        and operational progress in one place.
+                    </p>
+                </div>
+
+                <button class="report-button" type="button"
+                        onclick="window.print()">
+                    🖨️ Print / Save PDF
+                </button>
+            </div>
+
+            <!-- SAFE DATA FOR JAVASCRIPT -->
+            <div id="reportData"
+                 data-sales="{{ total_sales | default(0, true) | float }}"
+                 data-purchases="{{ total_purchases | default(0, true) | float }}"
+                 data-expenses="{{ total_expenses | default(0, true) | float }}"
+                 data-customers="{{ total_customers | default(0, true) | int }}"
+                 data-employees="{{ total_employees | default(0, true) | int }}"
+                 data-projects="{{ total_projects | default(0, true) | int }}"
+                 data-tickets="{{ total_tickets | default(0, true) | int }}"
+                 data-currency="{{ business.currency | default('INR', true) }}"
+                 hidden>
+            </div>
+
+            <!-- SUMMARY CARDS -->
+            <div class="report-stats">
+
+                <div class="report-stat">
+                    <div class="stat-label">Total Sales</div>
+                    <div class="stat-value" id="salesValue">
+                        {{ business.currency }} {{ "%.2f"|format(total_sales | default(0, true) | float) }}
+                    </div>
+                    <div class="stat-note">Recorded sales value</div>
+                </div>
+
+                <div class="report-stat">
+                    <div class="stat-label">Total Purchases</div>
+                    <div class="stat-value" id="purchasesValue">
+                        {{ business.currency }} {{ "%.2f"|format(total_purchases | default(0, true) | float) }}
+                    </div>
+                    <div class="stat-note">Recorded purchase value</div>
+                </div>
+
+                <div class="report-stat">
+                    <div class="stat-label">Total Expenses</div>
+                    <div class="stat-value" id="expensesValue">
+                        {{ business.currency }} {{ "%.2f"|format(total_expenses | default(0, true) | float) }}
+                    </div>
+                    <div class="stat-note">Recorded business expenses</div>
+                </div>
+
+                <div class="report-stat">
+                    <div class="stat-label">Estimated Balance</div>
+                    <div class="stat-value" id="balanceValue">—</div>
+                    <div class="stat-note">Sales minus purchases and expenses</div>
+                </div>
+
+            </div>
+
+            <!-- CHARTS -->
+            <div class="report-grid">
+
+                <div class="report-card">
+                    <h2>Financial Overview</h2>
+                    <p class="card-description">
+                        Compare recorded sales, purchases and expenses.
+                    </p>
+
+                    <div class="chart-container">
+                        <canvas id="financialChart"></canvas>
+                    </div>
+
+                    <div class="chart-error" id="financialChartError">
+                        The chart could not load. Check your internet connection
+                        and refresh this page.
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <h2>Financial Distribution</h2>
+                    <p class="card-description">
+                        View how recorded financial amounts compare.
+                    </p>
+
+                    <div class="chart-container">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+
+                    <div class="chart-error" id="distributionChartError">
+                        The chart could not load. Check your internet connection
+                        and refresh this page.
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- BUSINESS SUMMARY -->
+            <div class="report-card">
+                <h2>Business Activity Summary</h2>
+                <p class="card-description">
+                    A snapshot of your current business records.
+                </p>
+
+                <div class="report-details">
+
+                    <div class="detail-item">
+                        <span>👥 Total Customers</span>
+                        <strong>{{ total_customers | default(0, true) }}</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>👨‍💼 Total Employees</span>
+                        <strong>{{ total_employees | default(0, true) }}</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>📁 Total Projects</span>
+                        <strong>{{ total_projects | default(0, true) }}</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>🎧 Total Support Tickets</span>
+                        <strong>{{ total_tickets | default(0, true) }}</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>🛒 Recorded Sales</span>
+                        <strong id="salesSummary">0</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>🚚 Recorded Purchases</span>
+                        <strong id="purchasesSummary">0</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>💰 Recorded Expenses</span>
+                        <strong id="expensesSummary">0</strong>
+                    </div>
+
+                    <div class="detail-item balance-card">
+                        <span>📊 Estimated Balance</span>
+                        <strong id="balanceSummary">0</strong>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="report-footer">
+                Business OS · Reports are based on records currently stored in your system.
+                Estimated balance is not the same as verified accounting profit.
+            </div>
+
+        </section>
+    </main>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    function initializeReports() {
+        const dataElement = document.getElementById("reportData");
+
+        if (!dataElement) {
+            console.error("Reports: reportData element was not found.");
+            return;
+        }
+
+        function readNumber(attributeName) {
+            const value = Number(dataElement.dataset[attributeName]);
+            return Number.isFinite(value) ? value : 0;
+        }
+
+        const sales = readNumber("sales");
+        const purchases = readNumber("purchases");
+        const expenses = readNumber("expenses");
+        const currency = dataElement.dataset.currency || "INR";
+        const balance = sales - purchases - expenses;
+
+        function formatMoney(amount) {
+            try {
+                return currency + " " + amount.toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            } catch (error) {
+                return currency + " " + amount.toFixed(2);
+            }
+        }
+
+        document.getElementById("salesSummary").textContent =
+            formatMoney(sales);
+
+        document.getElementById("purchasesSummary").textContent =
+            formatMoney(purchases);
+
+        document.getElementById("expensesSummary").textContent =
+            formatMoney(expenses);
+
+        document.getElementById("balanceValue").textContent =
+            formatMoney(balance);
+
+        document.getElementById("balanceSummary").textContent =
+            formatMoney(balance);
+
+        const financialCanvas = document.getElementById("financialChart");
+        const distributionCanvas =
+            document.getElementById("distributionChart");
+
+        if (typeof Chart === "undefined") {
+            document.getElementById("financialChartError").style.display =
+                "block";
+
+            document.getElementById("distributionChartError").style.display =
+                "block";
+
+            console.error(
+                "Reports: Chart.js is unavailable. Check your internet connection."
+            );
+            return;
+        }
+
+        Chart.defaults.font.family = "Arial, Helvetica, sans-serif";
+        Chart.defaults.color = "#748096";
+
+        if (financialCanvas) {
+            try {
+                new Chart(financialCanvas, {
+                    type: "bar",
+                    data: {
+                        labels: [
+                            "Sales",
+                            "Purchases",
+                            "Expenses",
+                            "Estimated Balance"
+                        ],
+                        datasets: [{
+                            label: "Amount",
+                            data: [
+                                sales,
+                                purchases,
+                                expenses,
+                                balance
+                            ],
+                            backgroundColor: [
+                                "#4f46e5",
+                                "#e5a23b",
+                                "#e56b79",
+                                "#22a17b"
+                            ],
+                            borderRadius: 7,
+                            maxBarThickness: 55
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return formatMoney(
+                                            Number(context.raw) || 0
+                                        );
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function (value) {
+                                        return currency + " " +
+                                            Number(value).toLocaleString("en-IN");
+                                    }
+                                },
+                                grid: {
+                                    color: "#edf0f6"
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                document.getElementById("financialChartError").style.display =
+                    "block";
+                console.error("Financial chart error:", error);
+            }
+        }
+
+        if (distributionCanvas) {
+            try {
+                const distributionValues = [
+                    Math.max(0, sales),
+                    Math.max(0, purchases),
+                    Math.max(0, expenses)
+                ];
+
+                const hasActivity = distributionValues.some(
+                    function (value) {
+                        return value > 0;
+                    }
+                );
+
+                new Chart(distributionCanvas, {
+                    type: "doughnut",
+                    data: {
+                        labels: [
+                            "Sales",
+                            "Purchases",
+                            "Expenses"
+                        ],
+                        datasets: [{
+                            data: hasActivity
+                                ? distributionValues
+                                : [1, 1, 1],
+                            backgroundColor: hasActivity
+                                ? ["#4f46e5", "#e5a23b", "#e56b79"]
+                                : ["#e6eaf1", "#d7deea", "#c8d2e2"],
+                            borderWidth: 0,
+                            hoverOffset: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: "66%",
+                        plugins: {
+                            legend: {
+                                position: "bottom",
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 18
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        if (!hasActivity) {
+                                            return "No financial activity recorded";
+                                        }
+
+                                        return context.label + ": " +
+                                            formatMoney(Number(context.raw) || 0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                document.getElementById("distributionChartError").style.display =
+                    "block";
+                console.error("Distribution chart error:", error);
+            }
+        }
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener(
+            "DOMContentLoaded",
+            initializeReports
+        );
+    } else {
+        initializeReports();
+    }
+})();
+</script>
+
+</body>
+</html>
+```

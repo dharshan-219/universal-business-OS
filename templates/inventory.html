@@ -1,0 +1,547 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory | {{ business.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .inv-page {
+            --inv-green: #0f766e;
+            --inv-muted: #718096;
+            color: #172033;
+        }
+
+        .inv-page * { box-sizing: border-box; }
+
+        .inv-hero {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            padding: 30px;
+            margin-bottom: 25px;
+            color: white;
+            border-radius: 20px;
+            background: linear-gradient(120deg, #102a43, #0f766e);
+        }
+
+        .inv-hero::after {
+            content: "▦";
+            position: absolute;
+            right: 28px;
+            top: -40px;
+            font-size: 175px;
+            font-weight: 800;
+            color: rgba(255,255,255,.07);
+            pointer-events: none;
+        }
+
+        .inv-hero h2 {
+            margin: 0 0 10px;
+            font-size: clamp(23px, 3vw, 32px);
+            letter-spacing: -.5px;
+        }
+
+        .inv-hero p {
+            margin: 0;
+            max-width: 520px;
+            color: #d1fae5;
+            line-height: 1.7;
+        }
+
+        .inv-hero a {
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+            padding: 12px 17px;
+            border-radius: 11px;
+            background: white;
+            color: #115e59;
+            text-decoration: none;
+            font-weight: 700;
+            white-space: nowrap;
+            transition: transform .2s;
+        }
+
+        .inv-hero a:hover { transform: translateY(-2px); }
+
+        .inv-section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 28px 0 16px;
+        }
+
+        .inv-section-heading h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .inv-section-heading p {
+            margin: 6px 0 0;
+            color: var(--inv-muted);
+            font-size: 13px;
+        }
+
+        .inv-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 17px;
+        }
+
+        .inv-stat {
+            min-width: 0;
+            padding: 23px;
+            background: white;
+            border: 1px solid #e5eaf0;
+            border-radius: 17px;
+            box-shadow: 0 5px 18px rgba(25,40,60,.035);
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .inv-stat:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 24px rgba(25,40,60,.07);
+        }
+
+        .inv-stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 17px;
+        }
+
+        .inv-stat .symbol {
+            display: grid;
+            place-items: center;
+            width: 45px;
+            height: 45px;
+            border-radius: 13px;
+            font-size: 21px;
+        }
+
+        .inv-stat .label {
+            color: #718096;
+            font-size: 13px;
+        }
+
+        .inv-stat .number {
+            margin: 8px 0 0;
+            font-size: clamp(25px, 3vw, 33px);
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .inv-stat .hint {
+            margin-top: 8px;
+            color: #8a94a6;
+            font-size: 12px;
+        }
+
+        .inv-teal { background: #ccfbf1; }
+        .inv-amber { background: #fef3c7; }
+        .inv-red { background: #fee2e2; }
+
+        .inv-panel {
+            padding: 24px;
+            margin-top: 24px;
+            background: white;
+            border: 1px solid #e5eaf0;
+            border-radius: 18px;
+            box-shadow: 0 5px 18px rgba(25,40,60,.035);
+        }
+
+        .inv-panel-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 21px;
+        }
+
+        .inv-panel-head h2 {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .inv-panel-head p {
+            margin: 6px 0 0;
+            color: var(--inv-muted);
+            font-size: 13px;
+        }
+
+        .inv-search-wrap {
+            position: relative;
+            width: min(100%, 350px);
+        }
+
+        .inv-search-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .inv-search {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            border: 1px solid #dbe2ea;
+            border-radius: 11px;
+            outline: none;
+            font: inherit;
+            font-size: 13px;
+            background: #fbfcfe;
+        }
+
+        .inv-search:focus {
+            border-color: #0f766e;
+            box-shadow: 0 0 0 3px rgba(15,118,110,.1);
+        }
+
+        .inv-table-wrap {
+            overflow-x: auto;
+            border: 1px solid #edf0f4;
+            border-radius: 12px;
+        }
+
+        .inv-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 680px;
+        }
+
+        .inv-table th {
+            text-align: left;
+            padding: 14px;
+            color: #64748b;
+            background: #f7f9fc;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .6px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .inv-table td {
+            padding: 16px 14px;
+            border-bottom: 1px solid #edf0f4;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .inv-table tbody tr {
+            transition: background .15s;
+        }
+
+        .inv-table tbody tr:hover { background: #f8fbfa; }
+
+        .inv-table tbody tr:last-child td { border-bottom: 0; }
+
+        .inv-product {
+            display: block;
+            color: #172033;
+            font-weight: 700;
+        }
+
+        .inv-muted {
+            display: block;
+            margin-top: 5px;
+            color: #8792a4;
+            font-size: 11px;
+        }
+
+        .inv-quantity {
+            font-weight: 750;
+            color: #172033;
+        }
+
+        .inv-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 750;
+            white-space: nowrap;
+        }
+
+        .inv-good { color: #047857; background: #d1fae5; }
+        .inv-low { color: #92400e; background: #fef3c7; }
+        .inv-out { color: #b91c1c; background: #fee2e2; }
+
+        .inv-price { font-weight: 700; white-space: nowrap; }
+
+        .inv-empty {
+            padding: 36px 15px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .inv-empty-icon { font-size: 38px; }
+
+        .inv-empty h3 {
+            margin: 12px 0 7px;
+            color: #172033;
+        }
+
+        .inv-empty p {
+            margin: 0 0 15px;
+            font-size: 13px;
+        }
+
+        .inv-empty a {
+            color: #0f766e;
+            font-weight: 750;
+            text-decoration: none;
+        }
+
+        .inv-empty a:hover { text-decoration: underline; }
+
+        .inv-results {
+            margin: 12px 0 0;
+            color: #718096;
+            font-size: 12px;
+        }
+
+        [hidden] { display: none !important; }
+
+        @media (max-width: 800px) {
+            .inv-stats { grid-template-columns: 1fr; }
+            .inv-hero { padding: 23px; }
+            .inv-panel { padding: 17px; }
+            .inv-panel-head { align-items: stretch; }
+            .inv-search-wrap { width: 100%; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>Business OS</h2>
+            <p>{{ business.name }}</p>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('business_workspace', business_id=business.id) }}">📊 Dashboard</a>
+            <a href="{{ url_for('customers', business_id=business.id) }}">👥 Customers</a>
+            <a href="{{ url_for('products', business_id=business.id) }}">📦 Products</a>
+            <a href="{{ url_for('sales', business_id=business.id) }}">🛒 Sales</a>
+            <a class="active" href="{{ url_for('inventory', business_id=business.id) }}">📋 Inventory</a>
+            <a href="{{ url_for('purchases', business_id=business.id) }}">🚚 Purchases</a>
+            <a href="{{ url_for('finance', business_id=business.id) }}">💰 Finance</a>
+            <a href="{{ url_for('employees', business_id=business.id) }}">👨‍💼 Employees</a>
+            <a href="{{ url_for('projects', business_id=business.id) }}">📋 Projects</a>
+            <a href="{{ url_for('support', business_id=business.id) }}">🎧 Support</a>
+            <a href="{{ url_for('reports', business_id=business.id) }}">📈 Reports</a>
+            <a href="{{ url_for('business_settings', business_id=business.id) }}">⚙️ Settings</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('dashboard') }}">← My Businesses</a>
+            <a href="{{ url_for('logout') }}">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <main class="main inv-page">
+        <header class="topbar">
+            <div>
+                <h1>Inventory</h1>
+                <p>Stock control, availability, and product monitoring</p>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <section class="inv-hero">
+                <div>
+                    <h2>Know your stock. Plan ahead.</h2>
+                    <p>Monitor product availability, identify low-stock items, and keep your inventory organized.</p>
+                </div>
+                <a href="{{ url_for('products', business_id=business.id) }}">＋ Manage Products</a>
+            </section>
+
+            <div class="inv-section-heading">
+                <div>
+                    <h2>Stock at a glance</h2>
+                    <p>A quick overview of your current inventory.</p>
+                </div>
+            </div>
+
+            <section class="inv-stats">
+                <article class="inv-stat">
+                    <div class="inv-stat-top">
+                        <div class="symbol inv-teal">📦</div>
+                    </div>
+                    <div class="label">Total products</div>
+                    <h2 class="number">{{ products|length }}</h2>
+                    <div class="hint">Products registered in your catalogue</div>
+                </article>
+
+                <article class="inv-stat">
+                    <div class="inv-stat-top">
+                        <div class="symbol inv-amber">⚠️</div>
+                    </div>
+                    <div class="label">Low-stock products</div>
+                    <h2 class="number">{{ low_stock_count }}</h2>
+                    <div class="hint">Items that may need restocking</div>
+                </article>
+
+                <article class="inv-stat">
+                    <div class="inv-stat-top">
+                        <div class="symbol inv-red">🚫</div>
+                    </div>
+                    <div class="label">Out of stock</div>
+                    <h2 class="number">{{ out_of_stock_count }}</h2>
+                    <div class="hint">Items with no available stock</div>
+                </article>
+            </section>
+
+            <section class="inv-panel">
+                <div class="inv-panel-head">
+                    <div>
+                        <h2>Inventory directory</h2>
+                        <p>Search products, review quantities, and check stock status.</p>
+                    </div>
+
+                    {% if products %}
+                    <div class="inv-search-wrap">
+                        <span class="inv-search-icon">🔎</span>
+                        <input
+                            class="inv-search"
+                            id="inventorySearch"
+                            type="search"
+                            placeholder="Search name, SKU, or category..."
+                            aria-label="Search inventory">
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if products %}
+                <div class="inv-table-wrap">
+                    <table class="inv-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Available stock</th>
+                                <th>Stock status</th>
+                                <th>Selling price</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="inventoryBody">
+                        {% for product in products %}
+                            <tr class="inv-row">
+                                <td>
+                                    <span class="inv-product">{{ product.name }}</span>
+                                    <span class="inv-muted">SKU: {{ product.sku or "Not assigned" }}</span>
+                                </td>
+
+                                <td>{{ product.category or "Uncategorized" }}</td>
+
+                                <td>
+                                    <span class="inv-quantity">{{ product.stock_quantity }}</span>
+                                    {{ product.unit or "units" }}
+                                </td>
+
+                                <td>
+                                    {% if product.stock_quantity <= 0 %}
+                                        <span class="inv-badge inv-out">● Out of stock</span>
+                                    {% elif product.stock_quantity <= 5 %}
+                                        <span class="inv-badge inv-low">● Low stock</span>
+                                    {% else %}
+                                        <span class="inv-badge inv-good">● In stock</span>
+                                    {% endif %}
+                                </td>
+
+                                <td class="inv-price">
+                                    {{ business.currency }} {{ "%.2f"|format(product.selling_price) }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <p id="inventoryResults" class="inv-results">
+                    Showing {{ products|length }} product(s).
+                </p>
+
+                <div id="inventoryNoResults" class="inv-empty" hidden>
+                    <div class="inv-empty-icon">🔎</div>
+                    <h3>No matching products</h3>
+                    <p>Try another product name, SKU, or category.</p>
+                </div>
+
+                {% else %}
+                <div class="inv-empty">
+                    <div class="inv-empty-icon">📦</div>
+                    <h3>Your inventory is empty</h3>
+                    <p>Add products to start tracking your stock.</p>
+                    <a href="{{ url_for('products', business_id=business.id) }}">Go to Products →</a>
+                </div>
+                {% endif %}
+            </section>
+
+        </section>
+    </main>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    const search = document.getElementById("inventorySearch");
+    const body = document.getElementById("inventoryBody");
+    const empty = document.getElementById("inventoryNoResults");
+    const results = document.getElementById("inventoryResults");
+
+    if (!search || !body) return;
+
+    const rows = Array.from(body.querySelectorAll(".inv-row"));
+    const total = rows.length;
+
+    search.addEventListener("input", function () {
+        const query = search.value.trim().toLowerCase();
+        let visibleCount = 0;
+
+        rows.forEach(function (row) {
+            const matches = row.textContent.toLowerCase().includes(query);
+            row.hidden = !matches;
+
+            if (matches) {
+                visibleCount++;
+            }
+        });
+
+        if (empty) {
+            empty.hidden = visibleCount !== 0;
+        }
+
+        if (results) {
+            results.textContent = "Showing " + visibleCount +
+                " of " + total + " product(s).";
+            results.hidden = visibleCount === 0;
+        }
+    });
+})();
+</script>
+
+</body>
+</html>
+```

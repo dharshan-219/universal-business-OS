@@ -1,0 +1,930 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products | {{ business.name }}</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .products-page {
+            --p-accent: #087e8b;
+            --p-accent-dark: #07636d;
+            --p-soft: #e5f7f6;
+            --p-border: #e3eaf0;
+        }
+
+        .products-page .topbar {
+            align-items: center;
+        }
+
+        .p-business {
+            color: #617084;
+            font-size: 12px;
+            text-align: right;
+        }
+
+        .p-business strong {
+            display: block;
+            color: #172c3c;
+            font-size: 13px;
+        }
+
+        .p-hero {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            padding: 30px;
+            margin-bottom: 24px;
+            border-radius: 18px;
+            color: white;
+            background: linear-gradient(115deg, #102e3d, #075c69 70%, #0b8f96);
+        }
+
+        .p-hero::after {
+            content: "";
+            position: absolute;
+            width: 230px;
+            height: 230px;
+            right: 25px;
+            top: -125px;
+            border: 1px solid #ffffff20;
+            border-radius: 50%;
+            box-shadow: 0 0 0 30px #ffffff06,
+                        0 0 0 60px #ffffff05;
+            pointer-events: none;
+        }
+
+        .p-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .p-eyebrow {
+            display: inline-block;
+            margin-bottom: 12px;
+            color: #9ee9e7;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+        }
+
+        .p-hero h2 {
+            margin: 0 0 10px;
+            color: white;
+            font-size: clamp(24px, 3vw, 32px);
+            letter-spacing: -.7px;
+        }
+
+        .p-hero p {
+            max-width: 520px;
+            margin: 0;
+            color: #d0e7e9;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .p-hero-icon {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            place-items: center;
+            width: 78px;
+            height: 78px;
+            flex-shrink: 0;
+            border: 1px solid #ffffff35;
+            border-radius: 22px;
+            background: #ffffff13;
+            font-size: 34px;
+        }
+
+        .p-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 26px 0 15px;
+        }
+
+        .p-heading h2 {
+            margin: 0 0 5px;
+            font-size: 18px;
+        }
+
+        .p-heading p {
+            margin: 0;
+            color: #7d899b;
+            font-size: 12px;
+        }
+
+        .p-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .p-stat {
+            padding: 20px;
+            border: 1px solid var(--p-border);
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 3px 12px #102e3d05;
+        }
+
+        .p-stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 17px;
+        }
+
+        .p-stat-icon {
+            display: grid;
+            place-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--p-soft);
+            font-size: 18px;
+        }
+
+        .p-stat-icon.orange { background: #fff2df; }
+        .p-stat-icon.blue { background: #e8f1ff; }
+
+        .p-stat-label {
+            color: #8590a0;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .6px;
+            text-transform: uppercase;
+        }
+
+        .p-stat h3 {
+            margin: 0 0 5px;
+            color: #172c3c;
+            font-size: 27px;
+            letter-spacing: -.7px;
+            overflow-wrap: anywhere;
+        }
+
+        .p-stat p {
+            margin: 0;
+            color: #8490a0;
+            font-size: 11px;
+        }
+
+        .p-workspace {
+            display: grid;
+            grid-template-columns: minmax(260px, .78fr) minmax(0, 1.55fr);
+            align-items: start;
+            gap: 20px;
+        }
+
+        .products-page .section {
+            min-width: 0;
+            padding: 23px;
+        }
+
+        .p-panel-title {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .p-panel-icon {
+            display: grid;
+            place-items: center;
+            width: 41px;
+            height: 41px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: var(--p-soft);
+            color: var(--p-accent-dark);
+            font-size: 19px;
+        }
+
+        .p-panel-title h2 {
+            margin: 0 0 5px;
+            font-size: 17px;
+        }
+
+        .p-panel-title p {
+            margin: 0;
+            color: #8490a0;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .p-form label {
+            display: block;
+            margin: 14px 0 7px;
+            color: #344458;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .p-form input,
+        .p-form select {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            min-height: 43px;
+            padding: 10px 11px;
+            border: 1px solid #dce5eb;
+            border-radius: 9px;
+            outline: none;
+            background: #fcfefe;
+            color: #203144;
+            font: inherit;
+            font-size: 12px;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .p-form input:focus,
+        .p-form select:focus {
+            border-color: var(--p-accent);
+            box-shadow: 0 0 0 3px #087e8b17;
+        }
+
+        .p-form input::placeholder {
+            color: #9ba6b4;
+        }
+
+        .p-form .p-field-hint {
+            margin: 5px 0 0;
+            color: #8a96a5;
+            font-size: 10px;
+        }
+
+        .p-form .p-two-col {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .p-submit {
+            width: 100%;
+            min-height: 45px;
+            margin-top: 20px;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(100deg, #087e8b, #10a6a3);
+            color: white;
+            font-size: 12px;
+            font-weight: 750;
+            cursor: pointer;
+            box-shadow: 0 6px 16px #087e8b20;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .p-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 9px 20px #087e8b30;
+        }
+
+        .p-flash {
+            margin-bottom: 12px;
+            padding: 13px 15px;
+            border: 1px solid #bfe9e5;
+            border-radius: 10px;
+            background: #edfbf9;
+            color: #086b68;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .p-flash.error {
+            border-color: #fecaca;
+            background: #fff1f2;
+            color: #b42335;
+        }
+
+        .p-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 17px;
+        }
+
+        .p-count {
+            display: inline-flex;
+            padding: 7px 10px;
+            border-radius: 8px;
+            background: var(--p-soft);
+            color: var(--p-accent-dark);
+            font-size: 11px;
+            font-weight: 750;
+        }
+
+        .p-search {
+            width: 100%;
+            max-width: 230px;
+            min-width: 130px;
+            min-height: 39px;
+            padding: 9px 11px;
+            border: 1px solid #dfe7ed;
+            border-radius: 9px;
+            outline: none;
+            background: #fcfefe;
+            font: inherit;
+            font-size: 12px;
+        }
+
+        .p-search:focus {
+            border-color: var(--p-accent);
+            box-shadow: 0 0 0 3px #087e8b17;
+        }
+
+        .p-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #e7edf1;
+            border-radius: 11px;
+        }
+
+        .p-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .p-table th {
+            padding: 13px 12px;
+            background: #f5f9fa;
+            color: #758697;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .55px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .p-table td {
+            padding: 14px 12px;
+            border-top: 1px solid #edf1f4;
+            color: #506073;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+        .p-table tbody tr:hover { background: #f7fcfc; }
+        .p-table tbody tr[hidden] { display: none; }
+
+        .p-product {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 155px;
+        }
+
+        .p-product-icon {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            border-radius: 11px;
+            background: var(--p-soft);
+            font-size: 18px;
+        }
+
+        .p-product strong {
+            display: block;
+            color: #203144;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .p-product small {
+            display: block;
+            margin-top: 4px;
+            color: #8995a4;
+            font-size: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .p-price {
+            color: #203144;
+            font-weight: 750;
+            white-space: nowrap;
+        }
+
+        .p-subprice {
+            display: block;
+            margin-top: 4px;
+            color: #8b96a5;
+            font-size: 10px;
+            font-weight: 400;
+        }
+
+        .p-stock {
+            display: inline-flex;
+            padding: 5px 8px;
+            border-radius: 7px;
+            background: #e8f8ef;
+            color: #187449;
+            font-size: 11px;
+            font-weight: 750;
+            white-space: nowrap;
+        }
+
+        .p-stock.low {
+            background: #fff1df;
+            color: #a45a0b;
+        }
+
+        .p-stock.none {
+            background: #ffe9e9;
+            color: #b42335;
+        }
+
+        .p-category {
+            display: inline-block;
+            padding: 5px 8px;
+            border-radius: 7px;
+            background: #eef2f6;
+            color: #596b7d;
+            font-size: 10px;
+        }
+
+        .p-empty {
+            padding: 35px 15px;
+            text-align: center;
+        }
+
+        .p-empty-icon {
+            display: grid;
+            place-items: center;
+            width: 55px;
+            height: 55px;
+            margin: 0 auto 14px;
+            border-radius: 16px;
+            background: var(--p-soft);
+            font-size: 25px;
+        }
+
+        .p-empty h3 {
+            margin: 0 0 7px;
+            font-size: 15px;
+        }
+
+        .p-empty p {
+            margin: 0;
+            color: #8490a0;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .p-empty-row td { padding: 0; }
+        .p-empty-row[hidden] { display: none; }
+
+        .p-quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .p-quick-actions a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 14px;
+            border: 1px solid #e0e8ed;
+            border-radius: 10px;
+            background: white;
+            color: #42566a;
+            font-size: 12px;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        .p-quick-actions a:hover {
+            border-color: #9ddbd6;
+            background: #f4fcfb;
+            color: var(--p-accent-dark);
+        }
+
+        @media (max-width: 1100px) {
+            .p-workspace {
+                grid-template-columns: minmax(260px, .8fr) minmax(0, 1.2fr);
+            }
+        }
+
+        @media (max-width: 850px) {
+            .p-workspace { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 700px) {
+            .p-hero { padding: 23px 20px; }
+            .p-hero-icon {
+                width: 57px;
+                height: 57px;
+                border-radius: 16px;
+                font-size: 25px;
+            }
+            .p-stats { gap: 10px; }
+            .p-stat { padding: 14px; }
+            .p-stat h3 { font-size: 23px; }
+            .products-page .section { padding: 16px; }
+            .p-search { max-width: none; }
+            .p-toolbar { align-items: stretch; }
+        }
+
+        @media (max-width: 440px) {
+            .p-stats { grid-template-columns: 1fr; }
+            .p-stat {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            .p-stat-top { margin: 0; }
+            .p-stat-icon {
+                width: 43px;
+                height: 43px;
+            }
+            .p-stat h3 { margin-top: 2px; }
+            .p-hero-icon { display: none; }
+            .p-form .p-two-col { grid-template-columns: 1fr; gap: 0; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>Business OS</h2>
+            <p>{{ business.name }}</p>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('business_workspace', business_id=business.id) }}">📊 Dashboard</a>
+            <a href="{{ url_for('customers', business_id=business.id) }}">👥 Customers</a>
+            <a href="{{ url_for('products', business_id=business.id) }}" class="active">📦 Products</a>
+            <a href="{{ url_for('sales', business_id=business.id) }}">🛒 Sales</a>
+            <a href="{{ url_for('inventory', business_id=business.id) }}">📋 Inventory</a>
+            <a href="{{ url_for('purchases', business_id=business.id) }}">🚚 Purchases</a>
+            <a href="{{ url_for('finance', business_id=business.id) }}">💰 Finance</a>
+            <a href="{{ url_for('employees', business_id=business.id) }}">👨‍💼 Employees</a>
+            <a href="{{ url_for('projects', business_id=business.id) }}">📋 Projects</a>
+            <a href="{{ url_for('support', business_id=business.id) }}">🎧 Support</a>
+            <a href="{{ url_for('reports', business_id=business.id) }}">📈 Reports</a>
+            <a href="{{ url_for('business_settings', business_id=business.id) }}">⚙️ Settings</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('dashboard') }}">← My Businesses</a>
+            <a href="{{ url_for('logout') }}">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main products-page">
+
+        <header class="topbar">
+            <div>
+                <h1>Products & Services</h1>
+                <p>Organize your catalogue, prices and available stock.</p>
+            </div>
+
+            <div class="p-business">
+                <strong>{{ business.name }}</strong>
+                {{ business.business_type }}
+            </div>
+        </header>
+
+        <section class="content">
+
+            <!-- HERO -->
+            <div class="p-hero">
+                <div class="p-hero-content">
+                    <span class="p-eyebrow">PRODUCT CATALOGUE</span>
+                    <h2>Your products. Under control.</h2>
+                    <p>
+                        Manage your product catalogue, track opening stock,
+                        and keep purchase and selling prices organized in one place.
+                    </p>
+                </div>
+                <div class="p-hero-icon" aria-hidden="true">▦</div>
+            </div>
+
+            <!-- FLASH MESSAGES -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <div class="p-flash{% if category in ['error', 'danger'] %} error{% endif %}"
+                         role="status">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endwith %}
+
+            <!-- SUMMARY -->
+            <div class="p-heading">
+                <div>
+                    <h2>Catalogue overview</h2>
+                    <p>A quick summary of your saved products and services.</p>
+                </div>
+            </div>
+
+            <div class="p-stats">
+                <div class="p-stat">
+                    <div class="p-stat-top">
+                        <div class="p-stat-icon">▦</div>
+                    </div>
+                    <div>
+                        <h3>{{ products|length }}</h3>
+                        <p>Total products and services</p>
+                    </div>
+                </div>
+
+                <div class="p-stat">
+                    <div class="p-stat-top">
+                        <div class="p-stat-icon orange">◷</div>
+                    </div>
+                    <div>
+                        <h3>{{ products|selectattr('stock_quantity', 'le', 5)|list|length }}</h3>
+                        <p>Items with stock of 5 or less</p>
+                    </div>
+                </div>
+
+                <div class="p-stat">
+                    <div class="p-stat-top">
+                        <div class="p-stat-icon blue">₹</div>
+                    </div>
+                    <div>
+                        <h3>{{ business.currency }} {{ '%.2f'|format(products|sum(attribute='selling_price')) }}</h3>
+                        <p>Sum of listed selling prices</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORM AND CATALOGUE -->
+            <div class="p-workspace">
+
+                <!-- ADD PRODUCT -->
+                <section class="section">
+                    <div class="p-panel-title">
+                        <div class="p-panel-icon">＋</div>
+                        <div>
+                            <h2>Add product or service</h2>
+                            <p>Enter the item details for your catalogue.</p>
+                        </div>
+                    </div>
+
+                    <form class="p-form"
+                          method="POST"
+                          action="{{ url_for('add_product', business_id=business.id) }}">
+
+                        <label for="name">Product / service name *</label>
+                        <input type="text"
+                               id="name"
+                               name="name"
+                               placeholder="e.g. Cotton T-shirt"
+                               required>
+
+                        <div class="p-two-col">
+                            <div>
+                                <label for="sku">SKU / Code</label>
+                                <input type="text"
+                                       id="sku"
+                                       name="sku"
+                                       placeholder="e.g. TS-001">
+                            </div>
+                            <div>
+                                <label for="category">Category</label>
+                                <input type="text"
+                                       id="category"
+                                       name="category"
+                                       placeholder="e.g. Clothing">
+                            </div>
+                        </div>
+
+                        <div class="p-two-col">
+                            <div>
+                                <label for="selling_price">Selling price *</label>
+                                <input type="number"
+                                       id="selling_price"
+                                       name="selling_price"
+                                       min="0"
+                                       step="0.01"
+                                       placeholder="0.00"
+                                       required>
+                            </div>
+                            <div>
+                                <label for="purchase_price">Purchase price *</label>
+                                <input type="number"
+                                       id="purchase_price"
+                                       name="purchase_price"
+                                       min="0"
+                                       step="0.01"
+                                       placeholder="0.00"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="p-two-col">
+                            <div>
+                                <label for="stock_quantity">Opening stock *</label>
+                                <input type="number"
+                                       id="stock_quantity"
+                                       name="stock_quantity"
+                                       min="0"
+                                       step="any"
+                                       placeholder="0"
+                                       required>
+                                <p class="p-field-hint">Initial quantity available.</p>
+                            </div>
+                            <div>
+                                <label for="unit">Measurement unit</label>
+                                <select id="unit" name="unit">
+                                    <option value="piece">Piece</option>
+                                    <option value="kg">Kilogram</option>
+                                    <option value="gram">Gram</option>
+                                    <option value="liter">Liter</option>
+                                    <option value="meter">Meter</option>
+                                    <option value="hour">Hour</option>
+                                    <option value="service">Service</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button class="p-submit" type="submit">
+                            + &nbsp; Add to catalogue
+                        </button>
+                    </form>
+                </section>
+
+                <!-- PRODUCT TABLE -->
+                <section class="section">
+                    <div class="p-panel-title">
+                        <div class="p-panel-icon">▤</div>
+                        <div>
+                            <h2>Product catalogue</h2>
+                            <p>Review item details, pricing and available stock.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-toolbar">
+                        <span class="p-count">{{ products|length }} items</span>
+
+                        <input class="p-search"
+                               type="search"
+                               id="productSearch"
+                               placeholder="⌕  Search catalogue..."
+                               aria-label="Search products">
+                    </div>
+
+                    {% if products %}
+                        <div class="p-table-wrap">
+                            <table class="p-table">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Pricing</th>
+                                        <th>Stock</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="productTableBody">
+                                    {% for product in products %}
+                                        <tr class="p-product-row">
+                                            <td>
+                                                <div class="p-product">
+                                                    <div class="p-product-icon">📦</div>
+                                                    <div>
+                                                        <strong>{{ product.name }}</strong>
+                                                        <small>
+                                                            {% if product.sku %}
+                                                                SKU: {{ product.sku }}
+                                                            {% else %}
+                                                                No SKU assigned
+                                                            {% endif %}
+                                                        </small>
+                                                        <small>
+                                                            {{ product.category or 'Uncategorized' }}
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <span class="p-price">
+                                                    {{ business.currency }} {{ '%.2f'|format(product.selling_price) }}
+                                                </span>
+                                                <span class="p-subprice">
+                                                    Cost: {{ business.currency }} {{ '%.2f'|format(product.purchase_price) }}
+                                                </span>
+                                            </td>
+
+                                            <td>
+                                                {% if product.stock_quantity <= 0 %}
+                                                    <span class="p-stock none">
+                                                        Out of stock
+                                                    </span>
+                                                {% elif product.stock_quantity <= 5 %}
+                                                    <span class="p-stock low">
+                                                        {{ product.stock_quantity }} {{ product.unit }} · Low
+                                                    </span>
+                                                {% else %}
+                                                    <span class="p-stock">
+                                                        {{ product.stock_quantity }} {{ product.unit }}
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+
+                                    <tr class="p-empty-row" id="productNoResults" hidden>
+                                        <td colspan="3">
+                                            <div class="p-empty">
+                                                <div class="p-empty-icon">⌕</div>
+                                                <h3>No matching items</h3>
+                                                <p>Try searching by product name, SKU or category.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="p-empty">
+                            <div class="p-empty-icon">📦</div>
+                            <h3>Your catalogue starts here</h3>
+                            <p>
+                                No products or services have been added yet.
+                                Use the form to create your first catalogue entry.
+                            </p>
+                        </div>
+                    {% endif %}
+                </section>
+
+            </div>
+
+            <!-- QUICK LINKS -->
+            <div class="p-heading">
+                <div>
+                    <h2>Next steps</h2>
+                    <p>Continue managing your business operations.</p>
+                </div>
+            </div>
+
+            <section class="section">
+                <div class="p-quick-actions">
+                    <a href="{{ url_for('inventory', business_id=business.id) }}">
+                        📋 &nbsp; View inventory
+                    </a>
+                    <a href="{{ url_for('purchases', business_id=business.id) }}">
+                        🚚 &nbsp; Manage purchases
+                    </a>
+                    <a href="{{ url_for('sales', business_id=business.id) }}">
+                        🛒 &nbsp; Manage sales
+                    </a>
+                </div>
+            </section>
+
+        </section>
+    </main>
+</div>
+
+<script>
+(function () {
+    const search = document.getElementById("productSearch");
+    const tbody = document.getElementById("productTableBody");
+    const noResults = document.getElementById("productNoResults");
+
+    if (!search || !tbody) return;
+
+    search.addEventListener("input", function () {
+        const query = search.value.trim().toLowerCase();
+        const rows = tbody.querySelectorAll(".p-product-row");
+        let visibleCount = 0;
+
+        rows.forEach(function (row) {
+            const matches = row.textContent.toLowerCase().includes(query);
+            row.hidden = !matches;
+            if (matches) visibleCount++;
+        });
+
+        if (noResults) {
+            noResults.hidden = visibleCount !== 0;
+        }
+    });
+})();
+</script>
+
+</body>
+</html>

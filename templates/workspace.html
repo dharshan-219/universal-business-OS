@@ -1,0 +1,662 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ business.name }} | Business OS</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        /* Dashboard-specific design */
+        .dashboard-page {
+            --dash-primary: #6257e8;
+            --dash-ink: #182039;
+            --dash-muted: #778198;
+        }
+
+        .dashboard-page .topbar {
+            align-items: center;
+        }
+
+        .business-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+            background: #fff;
+            border: 1px solid #e7eaf2;
+            border-radius: 13px;
+            box-shadow: 0 3px 12px #17204406;
+        }
+
+        .business-avatar {
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #e8e5ff, #f2edff);
+            color: #5548d7;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .business-info strong,
+        .business-info span {
+            display: block;
+        }
+
+        .business-info strong {
+            max-width: 190px;
+            overflow-wrap: anywhere;
+            font-size: 13px;
+        }
+
+        .business-info span {
+            margin-top: 3px;
+            color: var(--dash-muted);
+            font-size: 11px;
+        }
+
+        .dashboard-page .welcome {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+            min-height: 200px;
+            padding: clamp(24px, 4vw, 42px);
+            margin-bottom: 25px;
+            border-radius: 20px;
+            color: white;
+            background: linear-gradient(115deg, #171b3e 0%, #302b70 65%, #5545a8 100%);
+            box-shadow: 0 15px 38px #28235c1c;
+        }
+
+        .welcome::after {
+            content: "";
+            position: absolute;
+            width: 290px;
+            height: 290px;
+            right: 4%;
+            top: -155px;
+            border: 1px solid #ffffff16;
+            border-radius: 50%;
+            box-shadow: 0 0 0 35px #ffffff05, 0 0 0 70px #ffffff04;
+            pointer-events: none;
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 1;
+            max-width: 570px;
+        }
+
+        .welcome-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding: 7px 11px;
+            border: 1px solid #ffffff24;
+            border-radius: 30px;
+            background: #ffffff0d;
+            color: #d4d0ff;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .welcome-tag span {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #a9ffcf;
+        }
+
+        .dashboard-page .welcome h2 {
+            margin: 0 0 11px;
+            color: #fff;
+            font-size: clamp(25px, 3vw, 36px);
+            letter-spacing: -1px;
+            overflow-wrap: anywhere;
+        }
+
+        .dashboard-page .welcome p {
+            max-width: 480px;
+            margin: 0;
+            color: #d0d2eb;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .welcome-art {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            width: 100px;
+            height: 100px;
+            border: 1px solid #ffffff25;
+            border-radius: 28px;
+            background: linear-gradient(145deg, #ffffff1b, #ffffff08);
+            box-shadow: inset 0 1px #ffffff16;
+            font-size: 42px;
+            transform: rotate(4deg);
+        }
+
+        .overview-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 15px;
+            margin: 30px 0 15px;
+        }
+
+        .overview-heading h2 {
+            margin: 0 0 5px;
+            font-size: 19px;
+            letter-spacing: -.4px;
+        }
+
+        .overview-heading p {
+            margin: 0;
+            color: var(--dash-muted);
+            font-size: 12px;
+        }
+
+        .overview-label {
+            color: #8a91a5;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .dashboard-page .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-page .stat-card {
+            min-width: 0;
+            padding: 21px;
+            border: 1px solid #e7eaf2;
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 3px 12px #17204405;
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .dashboard-page .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px #1720440d;
+        }
+
+        .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .stat-icon {
+            display: grid;
+            place-items: center;
+            width: 43px;
+            height: 43px;
+            border-radius: 13px;
+            font-size: 20px;
+        }
+
+        .stat-icon.violet { background: #efedff; }
+        .stat-icon.blue { background: #e8f2ff; }
+        .stat-icon.green { background: #e4f8ed; }
+        .stat-icon.orange { background: #fff1e5; }
+
+        .stat-caption {
+            color: #858da1;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .7px;
+            text-transform: uppercase;
+        }
+
+        .dashboard-page .stat-card h3 {
+            margin: 6px 0 4px;
+            font-size: clamp(21px, 2.3vw, 28px);
+            line-height: 1.3;
+            letter-spacing: -.8px;
+            overflow-wrap: anywhere;
+        }
+
+        .stat-description {
+            margin: 0;
+            color: #8790a4;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .dashboard-lower {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(250px, .85fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .dashboard-page .section {
+            min-width: 0;
+            padding: 23px;
+        }
+
+        .panel-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .panel-heading h2 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .panel-heading p {
+            margin: 5px 0 0;
+            font-size: 12px;
+        }
+
+        .panel-mark {
+            display: grid;
+            place-items: center;
+            width: 37px;
+            height: 37px;
+            flex-shrink: 0;
+            border-radius: 11px;
+            background: #f0eeff;
+            color: #6257e8;
+            font-size: 17px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .quick-action {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+            padding: 15px 13px;
+            border: 1px solid #e9ebf4;
+            border-radius: 12px;
+            background: #fff;
+            color: #26304a;
+            transition: border-color .2s, background .2s, transform .2s;
+        }
+
+        .quick-action:hover {
+            border-color: #c8c2ff;
+            background: #faf9ff;
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+        .action-icon {
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #f0eeff;
+            font-size: 17px;
+        }
+
+        .quick-action strong,
+        .quick-action small {
+            display: block;
+        }
+
+        .quick-action strong {
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .quick-action small {
+            margin-top: 3px;
+            color: #8a91a5;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        .activity-empty {
+            padding: 27px 14px;
+            border: 1px dashed #dfe3ee;
+            border-radius: 13px;
+            background: #fafbfe;
+            text-align: center;
+        }
+
+        .empty-icon {
+            display: grid;
+            place-items: center;
+            width: 49px;
+            height: 49px;
+            margin: 0 auto 13px;
+            border-radius: 15px;
+            background: #efedff;
+            font-size: 22px;
+        }
+
+        .activity-empty h3 {
+            margin: 0 0 7px;
+            font-size: 14px;
+        }
+
+        .activity-empty p {
+            margin: 0;
+            color: #858da1;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .dashboard-footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 22px;
+            padding: 16px 2px;
+            border-top: 1px solid #e8ebf2;
+            color: #8a91a5;
+            font-size: 11px;
+        }
+
+        @media (max-width: 1100px) {
+            .dashboard-page .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .dashboard-lower {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .business-info { display: none; }
+
+            .dashboard-page .welcome {
+                min-height: auto;
+                padding: 25px 21px;
+            }
+
+            .welcome-art {
+                width: 60px;
+                height: 60px;
+                border-radius: 18px;
+                font-size: 27px;
+            }
+
+            .dashboard-page .stats { gap: 11px; }
+
+            .dashboard-page .stat-card { padding: 15px; }
+
+            .stat-top {
+                align-items: flex-start;
+                margin-bottom: 17px;
+            }
+
+            .stat-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 17px;
+            }
+
+            .dashboard-page .section { padding: 17px; }
+
+            .quick-actions { grid-template-columns: 1fr; }
+
+            .dashboard-footer {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .dashboard-page .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-art { display: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .dashboard-page *,
+            .dashboard-page *::before,
+            .dashboard-page *::after {
+                transition-duration: .01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>Business OS</h2>
+            <p>{{ business.name }}</p>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('business_workspace', business_id=business.id) }}"
+               class="active">📊 Dashboard</a>
+            <a href="{{ url_for('customers', business_id=business.id) }}">👥 Customers</a>
+            <a href="{{ url_for('products', business_id=business.id) }}">📦 Products</a>
+            <a href="{{ url_for('sales', business_id=business.id) }}">🛒 Sales</a>
+            <a href="{{ url_for('inventory', business_id=business.id) }}">📋 Inventory</a>
+            <a href="{{ url_for('purchases', business_id=business.id) }}">🚚 Purchases</a>
+            <a href="{{ url_for('finance', business_id=business.id) }}">💰 Finance</a>
+            <a href="{{ url_for('employees', business_id=business.id) }}">👨‍💼 Employees</a>
+            <a href="{{ url_for('projects', business_id=business.id) }}">📋 Projects</a>
+            <a href="{{ url_for('support', business_id=business.id) }}">🎧 Support</a>
+            <a href="{{ url_for('reports', business_id=business.id) }}">📈 Reports</a>
+            <a href="{{ url_for('business_settings', business_id=business.id) }}">⚙️ Settings</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('dashboard') }}">← My Businesses</a>
+            <a href="{{ url_for('logout') }}">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <main class="main dashboard-page">
+
+        <header class="topbar">
+            <div>
+                <h1>Dashboard</h1>
+                <p>Your business at a glance</p>
+            </div>
+
+            <div class="business-info">
+                <div class="business-avatar">✳</div>
+                <div>
+                    <strong>{{ business.name }}</strong>
+                    <span>{{ business.business_type }}</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <!-- WELCOME BANNER -->
+            <div class="welcome">
+                <div class="welcome-content">
+                    <div class="welcome-tag">
+                        <span></span>
+                        BUSINESS OVERVIEW
+                    </div>
+
+                    <h2>Welcome back, {{ current_user.name }}.</h2>
+
+                    <p>
+                        Everything you need to manage your business,
+                        organized in one place. Choose a module below
+                        to keep your operations moving.
+                    </p>
+                </div>
+
+                <div class="welcome-art" aria-hidden="true">✳</div>
+            </div>
+
+            <!-- BUSINESS OVERVIEW -->
+            <div class="overview-heading">
+                <div>
+                    <h2>Business overview</h2>
+                    <p>A quick look at your key business areas.</p>
+                </div>
+
+                <span class="overview-label">OVERVIEW</span>
+            </div>
+
+            <div class="stats">
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon violet">🛒</div>
+                        <span class="stat-caption">Revenue</span>
+                    </div>
+                    <h3>₹0.00</h3>
+                    <p class="stat-description">Total sales recorded</p>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon blue">📦</div>
+                        <span class="stat-caption">Catalogue</span>
+                    </div>
+                    <h3>0</h3>
+                    <p class="stat-description">Products and services</p>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon green">👥</div>
+                        <span class="stat-caption">Customers</span>
+                    </div>
+                    <h3>0</h3>
+                    <p class="stat-description">Customer records</p>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon orange">💰</div>
+                        <span class="stat-caption">Expenses</span>
+                    </div>
+                    <h3>₹0.00</h3>
+                    <p class="stat-description">Recorded expenses</p>
+                </div>
+
+            </div>
+
+            <!-- QUICK ACTIONS AND ACTIVITY -->
+            <div class="dashboard-lower">
+
+                <section class="section">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Quick actions</h2>
+                            <p>Jump straight into your daily work.</p>
+                        </div>
+                        <div class="panel-mark">↗</div>
+                    </div>
+
+                    <div class="quick-actions">
+
+                        <a class="quick-action"
+                           href="{{ url_for('customers', business_id=business.id) }}">
+                            <span class="action-icon">👤</span>
+                            <span>
+                                <strong>Customers</strong>
+                                <small>Manage customer records</small>
+                            </span>
+                        </a>
+
+                        <a class="quick-action"
+                           href="{{ url_for('products', business_id=business.id) }}">
+                            <span class="action-icon">📦</span>
+                            <span>
+                                <strong>Products</strong>
+                                <small>Manage your catalogue</small>
+                            </span>
+                        </a>
+
+                        <a class="quick-action"
+                           href="{{ url_for('sales', business_id=business.id) }}">
+                            <span class="action-icon">🛒</span>
+                            <span>
+                                <strong>Record a sale</strong>
+                                <small>Open sales management</small>
+                            </span>
+                        </a>
+
+                        <a class="quick-action"
+                           href="{{ url_for('finance', business_id=business.id) }}">
+                            <span class="action-icon">📊</span>
+                            <span>
+                                <strong>View finances</strong>
+                                <small>Review financial estimates</small>
+                            </span>
+                        </a>
+
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Recent activity</h2>
+                            <p>Updates from your workspace.</p>
+                        </div>
+                        <div class="panel-mark">◷</div>
+                    </div>
+
+                    <div class="activity-empty">
+                        <div class="empty-icon">✳</div>
+                        <h3>Your workspace starts here</h3>
+                        <p>
+                            When activity tracking is connected,
+                            your recent business updates can appear here.
+                            Start by adding a customer or product.
+                        </p>
+                    </div>
+                </section>
+
+            </div>
+
+            <footer class="dashboard-footer">
+                <span>Universal Business OS</span>
+                <span>One workspace. Many possibilities.</span>
+            </footer>
+
+        </section>
+    </main>
+</div>
+</body>
+</html>

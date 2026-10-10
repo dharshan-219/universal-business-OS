@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expenses - {{ business.name }}</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            color: #1f2937;
+        }
+        header {
+            background: #172554;
+            color: white;
+            padding: 20px 6%;
+        }
+        main {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 18px;
+        }
+        .card {
+            background: white;
+            padding: 22px;
+            margin-bottom: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0000000a;
+        }
+        .summary {
+            background: #ecfdf5;
+            border-left: 5px solid #059669;
+        }
+        form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 14px;
+        }
+        input, select, textarea, button {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            font: inherit;
+        }
+        textarea { min-height: 44px; }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .wide { grid-column: 1 / -1; }
+        .links a {
+            display: inline-block;
+            margin: 5px 12px 5px 0;
+            color: #2563eb;
+        }
+        .table-wrap { overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th { background: #f9fafb; }
+        .message { color: #047857; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Expense Management</h1>
+    <p>{{ business.name }} · {{ business.currency }}</p>
+</header>
+
+<main>
+    <div class="card links">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('business_workspace', business_id=business.id) }}">Workspace</a>
+        <a href="{{ url_for('customers', business_id=business.id) }}">Customers</a>
+        <a href="{{ url_for('products', business_id=business.id) }}">Products</a>
+        <a href="{{ url_for('sales', business_id=business.id) }}">Sales</a>
+        <a href="{{ url_for('inventory', business_id=business.id) }}">Inventory</a>
+        <a href="{{ url_for('purchases', business_id=business.id) }}">Purchases</a>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+      {% for message in messages %}
+        <p class="message">{{ message }}</p>
+      {% endfor %}
+    {% endwith %}
+
+    <div class="card summary">
+        <h2>Total Recorded Expenses</h2>
+        <h1>{{ business.currency }} {{ "%.2f"|format(total_expenses) }}</h1>
+        <p>This is the sum of recorded expenses, not profit.</p>
+    </div>
+
+    <div class="card">
+        <h2>Record a New Expense</h2>
+        <form method="POST"
+              action="{{ url_for('add_expense', business_id=business.id) }}">
+            <input name="title" placeholder="Expense title" required>
+
+            <select name="category" required>
+                <option value="">Select category</option>
+                <option>Rent</option>
+                <option>Electricity</option>
+                <option>Salary</option>
+                <option>Transport</option>
+                <option>Marketing</option>
+                <option>Internet</option>
+                <option>Maintenance</option>
+                <option>Other</option>
+            </select>
+
+            <input name="amount" type="number" min="0.01"
+                   step="0.01" placeholder="Amount" required>
+
+            <input name="expense_date" type="date" required>
+
+            <textarea class="wide" name="description"
+                      placeholder="Description (optional)"></textarea>
+
+            <button class="wide" type="submit">Save Expense</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Expense History</h2>
+        {% if expenses %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr>
+                        <td>{{ expense.expense_date.strftime('%d-%m-%Y') }}</td>
+                        <td>{{ expense.title }}</td>
+                        <td>{{ expense.category }}</td>
+                        <td>{{ expense.description or '-' }}</td>
+                        <td>{{ business.currency }} {{ "%.2f"|format(expense.amount) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No expenses recorded yet.</p>
+        {% endif %}
+    </div>
+</main>
+</body>
+</html>

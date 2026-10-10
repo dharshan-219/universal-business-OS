@@ -1,0 +1,761 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchases | {{ business.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .pur-page {
+            --pur-primary: #4f46e5;
+            --pur-muted: #718096;
+            color: #172033;
+        }
+
+        .pur-page * { box-sizing: border-box; }
+
+        .pur-hero {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            border-radius: 20px;
+            color: white;
+            background: linear-gradient(120deg, #172554, #4338ca);
+        }
+
+        .pur-hero::after {
+            content: "↗";
+            position: absolute;
+            right: 30px;
+            top: -55px;
+            font-size: 190px;
+            font-weight: 800;
+            color: rgba(255,255,255,.07);
+            pointer-events: none;
+        }
+
+        .pur-hero h2 {
+            margin: 0 0 10px;
+            font-size: clamp(24px, 3vw, 32px);
+            letter-spacing: -.5px;
+        }
+
+        .pur-hero p {
+            margin: 0;
+            max-width: 550px;
+            color: #dbeafe;
+            line-height: 1.7;
+        }
+
+        .pur-hero-tag {
+            position: relative;
+            z-index: 1;
+            padding: 11px 15px;
+            border: 1px solid rgba(255,255,255,.25);
+            border-radius: 11px;
+            background: rgba(255,255,255,.12);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .pur-heading {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 28px 0 16px;
+        }
+
+        .pur-heading h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .pur-heading p {
+            margin: 6px 0 0;
+            color: var(--pur-muted);
+            font-size: 13px;
+        }
+
+        .pur-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 17px;
+            margin-bottom: 26px;
+        }
+
+        .pur-stat {
+            padding: 22px;
+            min-width: 0;
+            background: white;
+            border: 1px solid #e5eaf0;
+            border-radius: 16px;
+            box-shadow: 0 5px 18px rgba(25,40,60,.035);
+        }
+
+        .pur-stat-icon {
+            display: grid;
+            place-items: center;
+            width: 44px;
+            height: 44px;
+            margin-bottom: 17px;
+            border-radius: 13px;
+            font-size: 21px;
+        }
+
+        .pur-stat-label {
+            color: #718096;
+            font-size: 13px;
+        }
+
+        .pur-stat-value {
+            margin: 9px 0 0;
+            font-size: clamp(22px, 2.4vw, 29px);
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .pur-stat-note {
+            margin-top: 7px;
+            color: #8a94a6;
+            font-size: 12px;
+        }
+
+        .pur-indigo { background: #e8eaff; }
+        .pur-blue { background: #e0f2fe; }
+        .pur-green { background: #dcfce7; }
+
+        .pur-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+            align-items: start;
+        }
+
+        .pur-panel {
+            min-width: 0;
+            padding: 24px;
+            background: white;
+            border: 1px solid #e5eaf0;
+            border-radius: 18px;
+            box-shadow: 0 5px 18px rgba(25,40,60,.035);
+        }
+
+        .pur-panel-head {
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+            margin-bottom: 8px;
+        }
+
+        .pur-panel-icon {
+            display: grid;
+            place-items: center;
+            width: 43px;
+            height: 43px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: #eef2ff;
+            font-size: 20px;
+        }
+
+        .pur-panel h2 {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .pur-description {
+            margin: 6px 0 0;
+            color: var(--pur-muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .pur-form {
+            display: grid;
+            gap: 16px;
+            margin-top: 23px;
+        }
+
+        .pur-field label {
+            display: block;
+            margin-bottom: 7px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .pur-field input,
+        .pur-field select {
+            display: block;
+            width: 100%;
+            min-height: 45px;
+            padding: 11px 12px;
+            border: 1px solid #dbe2ea;
+            border-radius: 10px;
+            background: #fff;
+            color: #172033;
+            font: inherit;
+            font-size: 13px;
+        }
+
+        .pur-field input:focus,
+        .pur-field select:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+        }
+
+        .pur-button {
+            width: 100%;
+            border: 0;
+            border-radius: 10px;
+            padding: 13px 16px;
+            background: #4f46e5;
+            color: white;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 750;
+            cursor: pointer;
+            transition: background .2s, transform .2s;
+        }
+
+        .pur-button:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        .pur-preview {
+            padding: 16px;
+            border: 1px solid #dfe4ff;
+            border-radius: 12px;
+            background: #f5f6ff;
+            color: #3730a3;
+            line-height: 1.6;
+            font-size: 13px;
+        }
+
+        .pur-preview-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #6366a1;
+            font-size: 12px;
+        }
+
+        .pur-preview-total {
+            font-size: 23px;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .pur-history-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .pur-search {
+            width: min(100%, 330px);
+            min-height: 43px;
+            padding: 11px 13px;
+            border: 1px solid #dbe2ea;
+            border-radius: 10px;
+            outline: none;
+            font: inherit;
+            font-size: 13px;
+        }
+
+        .pur-search:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,.1);
+        }
+
+        .pur-history {
+            display: grid;
+            gap: 12px;
+        }
+
+        .pur-record {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+            flex-wrap: wrap;
+            padding: 19px;
+            border: 1px solid #e7ebf2;
+            border-radius: 14px;
+            transition: border-color .2s, background .2s;
+        }
+
+        .pur-record:hover {
+            border-color: #c7d2fe;
+            background: #fcfcff;
+        }
+
+        .pur-record h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #172033;
+        }
+
+        .pur-record p {
+            margin: 7px 0 0;
+            color: #718096;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .pur-record-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 12px;
+        }
+
+        .pur-meta-chip {
+            padding: 6px 9px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 11px;
+        }
+
+        .pur-record-total {
+            min-width: 130px;
+            text-align: right;
+        }
+
+        .pur-record-total span {
+            display: block;
+            color: #718096;
+            font-size: 12px;
+        }
+
+        .pur-total {
+            margin-top: 7px;
+            color: #3730a3;
+            font-size: 20px;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .pur-empty {
+            padding: 32px 14px;
+            text-align: center;
+            color: #718096;
+            line-height: 1.7;
+        }
+
+        .pur-empty-icon { font-size: 37px; }
+
+        .pur-empty h3 {
+            margin: 12px 0 6px;
+            color: #172033;
+        }
+
+        .pur-empty p {
+            margin: 5px 0;
+            font-size: 13px;
+        }
+
+        .pur-empty a {
+            color: #4f46e5;
+            font-weight: 750;
+            text-decoration: none;
+        }
+
+        .pur-empty a:hover { text-decoration: underline; }
+
+        .pur-results {
+            margin: 14px 0 0;
+            color: #718096;
+            font-size: 12px;
+        }
+
+        [hidden] { display: none !important; }
+
+        @media (max-width: 1050px) {
+            .pur-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 750px) {
+            .pur-stats { grid-template-columns: 1fr; }
+            .pur-hero { padding: 23px; }
+            .pur-panel { padding: 18px; }
+            .pur-record-total { text-align: left; }
+            .pur-search { width: 100%; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>Business OS</h2>
+            <p>{{ business.name }}</p>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('business_workspace', business_id=business.id) }}">📊 Dashboard</a>
+            <a href="{{ url_for('customers', business_id=business.id) }}">👥 Customers</a>
+            <a href="{{ url_for('products', business_id=business.id) }}">📦 Products</a>
+            <a href="{{ url_for('sales', business_id=business.id) }}">🛒 Sales</a>
+            <a href="{{ url_for('inventory', business_id=business.id) }}">📋 Inventory</a>
+            <a class="active" href="{{ url_for('purchases', business_id=business.id) }}">🚚 Purchases</a>
+            <a href="{{ url_for('finance', business_id=business.id) }}">💰 Finance</a>
+            <a href="{{ url_for('employees', business_id=business.id) }}">👨‍💼 Employees</a>
+            <a href="{{ url_for('projects', business_id=business.id) }}">📋 Projects</a>
+            <a href="{{ url_for('support', business_id=business.id) }}">🎧 Support</a>
+            <a href="{{ url_for('reports', business_id=business.id) }}">📈 Reports</a>
+            <a href="{{ url_for('business_settings', business_id=business.id) }}">⚙️ Settings</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('dashboard') }}">← My Businesses</a>
+            <a href="{{ url_for('logout') }}">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <main class="main pur-page">
+        <header class="topbar">
+            <div>
+                <h1>Purchases & Suppliers</h1>
+                <p>Supplier relationships, incoming stock, and purchase costs</p>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <section class="pur-hero">
+                <div>
+                    <h2>Purchasing, made organized.</h2>
+                    <p>Manage supplier contacts, record incoming goods, and keep track of your purchase spending.</p>
+                </div>
+                <div class="pur-hero-tag">🚚 Supplier management</div>
+            </section>
+
+            <div class="pur-heading">
+                <div>
+                    <h2>Purchasing overview</h2>
+                    <p>Quick access to your supplier and purchase workflow.</p>
+                </div>
+            </div>
+
+            <section class="pur-stats">
+                <article class="pur-stat">
+                    <div class="pur-stat-icon pur-indigo">🤝</div>
+                    <div class="pur-stat-label">Registered suppliers</div>
+                    <div class="pur-stat-value">{{ suppliers|length }}</div>
+                    <div class="pur-stat-note">Suppliers available for purchasing</div>
+                </article>
+
+                <article class="pur-stat">
+                    <div class="pur-stat-icon pur-blue">📦</div>
+                    <div class="pur-stat-label">Recorded purchases</div>
+                    <div class="pur-stat-value">{{ purchases|length }}</div>
+                    <div class="pur-stat-note">Purchase transactions recorded</div>
+                </article>
+
+                <article class="pur-stat">
+                    <div class="pur-stat-icon pur-green">💰</div>
+                    <div class="pur-stat-label">Total purchase spending</div>
+                    <div class="pur-stat-value">
+                        {{ business.currency }} {{ "%.2f"|format(purchases|sum(attribute='total_amount')) }}
+                    </div>
+                    <div class="pur-stat-note">Sum of recorded purchase totals</div>
+                </article>
+            </section>
+
+            <div class="pur-heading">
+                <div>
+                    <h2>Purchase workspace</h2>
+                    <p>Add a supplier or record a new stock purchase.</p>
+                </div>
+            </div>
+
+            <div class="pur-grid">
+
+                <section class="pur-panel">
+                    <div class="pur-panel-head">
+                        <div class="pur-panel-icon">🤝</div>
+                        <div>
+                            <h2>Add supplier</h2>
+                            <p class="pur-description">Save supplier contact details for future purchases.</p>
+                        </div>
+                    </div>
+
+                    <form class="pur-form" method="POST"
+                          action="{{ url_for('add_supplier', business_id=business.id) }}">
+
+                        <div class="pur-field">
+                            <label for="supplierName">Supplier name *</label>
+                            <input id="supplierName" name="name"
+                                   placeholder="Company or supplier name" required>
+                        </div>
+
+                        <div class="pur-field">
+                            <label for="supplierPhone">Phone number</label>
+                            <input id="supplierPhone" name="phone" type="tel"
+                                   placeholder="Phone number">
+                        </div>
+
+                        <div class="pur-field">
+                            <label for="supplierEmail">Email address</label>
+                            <input id="supplierEmail" name="email" type="email"
+                                   placeholder="supplier@example.com">
+                        </div>
+
+                        <div class="pur-field">
+                            <label for="supplierAddress">Address</label>
+                            <input id="supplierAddress" name="address"
+                                   placeholder="Supplier address">
+                        </div>
+
+                        <button class="pur-button" type="submit">＋ Save supplier</button>
+                    </form>
+                </section>
+
+                <section class="pur-panel">
+                    <div class="pur-panel-head">
+                        <div class="pur-panel-icon">🛒</div>
+                        <div>
+                            <h2>Record purchase</h2>
+                            <p class="pur-description">Record products received from one of your suppliers.</p>
+                        </div>
+                    </div>
+
+                    {% if suppliers and products %}
+                    <form class="pur-form" method="POST"
+                          action="{{ url_for('add_purchase', business_id=business.id) }}">
+
+                        <div class="pur-field">
+                            <label for="supplier_id">Supplier *</label>
+                            <select id="supplier_id" name="supplier_id" required>
+                                <option value="">Choose a supplier</option>
+                                {% for supplier in suppliers %}
+                                <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="pur-field">
+                            <label for="product_id">Product *</label>
+                            <select id="product_id" name="product_id" required>
+                                <option value="">Choose a product</option>
+                                {% for product in products %}
+                                <option value="{{ product.id }}"
+                                        data-price="{{ product.purchase_price }}">
+                                    {{ product.name }} — Stock: {{ product.stock_quantity }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="pur-field">
+                            <label for="purchaseQuantity">Quantity received *</label>
+                            <input id="purchaseQuantity" type="number" name="quantity"
+                                   min="0.001" step="any"
+                                   placeholder="Enter quantity" required>
+                        </div>
+
+                        <div class="pur-field">
+                            <label for="unitCost">Cost per unit ({{ business.currency }}) *</label>
+                            <input id="unitCost" type="number" name="unit_cost"
+                                   min="0" step="0.01"
+                                   placeholder="Enter unit cost" required>
+                        </div>
+
+                        <div id="purchasePreview" class="pur-preview" aria-live="polite">
+                            <span class="pur-preview-label">Estimated purchase total</span>
+                            <span id="purchasePreviewAmount" class="pur-preview-total">—</span>
+                            <div id="purchasePreviewMessage">
+                                Select a product and enter quantity and unit cost.
+                            </div>
+                        </div>
+
+                        <button class="pur-button" type="submit">＋ Record purchase</button>
+                    </form>
+                    {% else %}
+                    <div class="pur-empty">
+                        <div class="pur-empty-icon">📋</div>
+                        <h3>Almost ready to purchase</h3>
+                        <p>You need at least one supplier and one product before recording a purchase.</p>
+                        <p><a href="{{ url_for('products', business_id=business.id) }}">Open Products →</a></p>
+                    </div>
+                    {% endif %}
+                </section>
+
+            </div>
+
+            <section class="pur-panel">
+                <div class="pur-history-head">
+                    <div>
+                        <h2>Purchase history</h2>
+                        <p class="pur-description">Review previous transactions, suppliers, and recorded costs.</p>
+                    </div>
+
+                    {% if purchases %}
+                    <input id="purchaseSearch" class="pur-search" type="search"
+                           placeholder="Search product or supplier..."
+                           aria-label="Search purchase history">
+                    {% endif %}
+                </div>
+
+                {% if purchases %}
+                <div class="pur-history" id="purchaseHistory">
+                    {% for purchase in purchases %}
+                    <article class="pur-record pur-record-row">
+                        <div>
+                            <h3>{{ purchase.product.name }}</h3>
+                            <p>Supplier: {{ purchase.supplier.name }}</p>
+
+                            <div class="pur-record-meta">
+                                <span class="pur-meta-chip">
+                                    Qty: {{ purchase.quantity }} {{ purchase.product.unit or "units" }}
+                                </span>
+                                <span class="pur-meta-chip">
+                                    Unit cost: {{ business.currency }} {{ "%.2f"|format(purchase.unit_cost) }}
+                                </span>
+                            </div>
+
+                            <p>
+                                📅
+                                {{ purchase.created_at.strftime("%d-%m-%Y %I:%M %p")
+                                   if purchase.created_at else "Date not available" }}
+                            </p>
+                        </div>
+
+                        <div class="pur-record-total">
+                            <span>Purchase total</span>
+                            <div class="pur-total">
+                                {{ business.currency }} {{ "%.2f"|format(purchase.total_amount) }}
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+
+                <p id="purchaseResults" class="pur-results">
+                    Showing {{ purchases|length }} purchase(s).
+                </p>
+
+                <div id="purchaseNoResults" class="pur-empty" hidden>
+                    <div class="pur-empty-icon">🔎</div>
+                    <h3>No matching purchases</h3>
+                    <p>Try searching with another product or supplier name.</p>
+                </div>
+
+                {% else %}
+                <div class="pur-empty">
+                    <div class="pur-empty-icon">🚚</div>
+                    <h3>No purchases recorded yet</h3>
+                    <p>Once you record a purchase, it will appear here.</p>
+                </div>
+                {% endif %}
+            </section>
+
+        </section>
+    </main>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    const search = document.getElementById("purchaseSearch");
+    const history = document.getElementById("purchaseHistory");
+    const noResults = document.getElementById("purchaseNoResults");
+    const results = document.getElementById("purchaseResults");
+
+    if (search && history) {
+        const rows = Array.from(history.querySelectorAll(".pur-record-row"));
+        const totalRows = rows.length;
+
+        search.addEventListener("input", function () {
+            const query = search.value.trim().toLowerCase();
+            let visibleCount = 0;
+
+            rows.forEach(function (row) {
+                const matches = row.textContent.toLowerCase().includes(query);
+                row.hidden = !matches;
+
+                if (matches) visibleCount++;
+            });
+
+            if (noResults) {
+                noResults.hidden = visibleCount !== 0;
+            }
+
+            if (results) {
+                results.textContent = "Showing " + visibleCount +
+                    " of " + totalRows + " purchase(s).";
+                results.hidden = visibleCount === 0;
+            }
+        });
+    }
+
+    const product = document.getElementById("product_id");
+    const quantity = document.getElementById("purchaseQuantity");
+    const cost = document.getElementById("unitCost");
+    const previewAmount = document.getElementById("purchasePreviewAmount");
+    const previewMessage = document.getElementById("purchasePreviewMessage");
+
+    function updatePurchasePreview() {
+        if (!product || !quantity || !cost || !previewAmount || !previewMessage) {
+            return;
+        }
+
+        const qty = Number(quantity.value);
+        const unitCost = Number(cost.value);
+        const hasProduct = product.value !== "";
+        const hasQuantity = quantity.value.trim() !== "";
+        const hasCost = cost.value.trim() !== "";
+
+        if (!hasProduct || !hasQuantity || !hasCost ||
+            !Number.isFinite(qty) || !Number.isFinite(unitCost) ||
+            qty <= 0 || unitCost < 0) {
+            previewAmount.textContent = "—";
+            previewMessage.textContent =
+                "Select a product and enter a valid quantity and unit cost.";
+            return;
+        }
+
+        const total = qty * unitCost;
+
+        previewAmount.textContent =
+            "{{ business.currency }}" + " " +
+            total.toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+        previewMessage.textContent =
+            qty.toLocaleString("en-IN") + " unit(s) × " +
+            "{{ business.currency }}" + " " + unitCost.toFixed(2);
+    }
+
+    [product, quantity, cost].forEach(function (element) {
+        if (element) {
+            element.addEventListener("input", updatePurchasePreview);
+            element.addEventListener("change", updatePurchasePreview);
+        }
+    });
+})();
+</script>
+</body>
+</html>
+```

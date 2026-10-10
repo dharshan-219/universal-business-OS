@@ -1,0 +1,353 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Universal Business OS</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        :root {
+            --navy: #0b1020;
+            --purple: #7667f8;
+            --text: #182033;
+            --muted: #788197;
+            --border: #e6e8f0;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: #f6f7fc;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .layout {
+            width: 100%;
+            max-width: 1050px;
+            min-height: 620px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
+            border-radius: 26px;
+            background: white;
+            box-shadow: 0 25px 80px #18204418;
+        }
+
+        .brand-panel {
+            position: relative;
+            overflow: hidden;
+            padding: 48px;
+            background: linear-gradient(145deg, #11182f, #171b43 60%, #33266b);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .brand-panel::before,
+        .brand-panel::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .brand-panel::before {
+            width: 300px;
+            height: 300px;
+            background: #7967ff24;
+            right: -100px;
+            top: 100px;
+            filter: blur(5px);
+        }
+
+        .brand-panel::after {
+            width: 220px;
+            height: 220px;
+            background: #bd8cff1c;
+            left: -100px;
+            bottom: 30px;
+        }
+
+        .brand-content, .brand-footer, .brand-name {
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-name {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 17px;
+            font-weight: 750;
+        }
+
+        .brand-icon {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            border: 1px solid #ffffff35;
+            border-radius: 14px;
+            background: #ffffff12;
+            font-size: 23px;
+        }
+
+        .eyebrow {
+            color: #b9b3ff;
+            font-size: 11px;
+            letter-spacing: 2.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .brand-content h2 {
+            font-size: clamp(32px, 4vw, 45px);
+            line-height: 1.14;
+            letter-spacing: -1.7px;
+            margin: 20px 0;
+        }
+
+        .brand-content p {
+            color: #c1c8dd;
+            line-height: 1.8;
+            max-width: 350px;
+            font-size: 14px;
+        }
+
+        .feature-list {
+            display: grid;
+            gap: 15px;
+            margin-top: 35px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #e4e7f5;
+            font-size: 13px;
+        }
+
+        .feature span {
+            display: grid;
+            place-items: center;
+            width: 29px;
+            height: 29px;
+            border-radius: 9px;
+            background: #ffffff12;
+            color: #c4bdff;
+        }
+
+        .brand-footer {
+            color: #a8b0c9;
+            font-size: 11px;
+        }
+
+        .form-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: clamp(28px, 5vw, 65px);
+        }
+
+        .mobile-brand { display: none; }
+
+        .form-panel h1 {
+            margin: 0 0 10px;
+            font-size: 31px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            margin: 0 0 32px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .flash {
+            padding: 12px 14px;
+            margin-bottom: 18px;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            background: #fff1f2;
+            color: #b42335;
+            font-size: 13px;
+        }
+
+        .field { margin-bottom: 21px; }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            font-size: 12px;
+            font-weight: 750;
+            color: #30384d;
+        }
+
+        input {
+            width: 100%;
+            height: 49px;
+            padding: 0 15px;
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            outline: none;
+            font: inherit;
+            font-size: 13px;
+            transition: .2s;
+            background: #fcfcff;
+        }
+
+        input:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 4px #7667f81c;
+            background: white;
+        }
+
+        .submit {
+            width: 100%;
+            min-height: 50px;
+            border: 0;
+            border-radius: 11px;
+            background: linear-gradient(100deg, #6557e8, #8974ff);
+            color: white;
+            font-size: 14px;
+            font-weight: 750;
+            cursor: pointer;
+            box-shadow: 0 8px 20px #7667f82e;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px #7667f842;
+        }
+
+        .switch {
+            margin-top: 26px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        a {
+            color: #6557e8;
+            font-weight: 750;
+            text-decoration: none;
+        }
+
+        a:hover { text-decoration: underline; }
+
+        .security {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 11px;
+            color: #98a0b3;
+        }
+
+        @media (max-width: 760px) {
+            body { padding: 14px; }
+            .layout {
+                max-width: 460px;
+                min-height: auto;
+                grid-template-columns: 1fr;
+                border-radius: 20px;
+            }
+            .brand-panel { display: none; }
+            .form-panel { padding: 35px 25px; }
+            .mobile-brand {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 36px;
+                font-weight: 800;
+                font-size: 15px;
+            }
+            .mobile-brand .brand-icon {
+                background: #7667f814;
+                color: #6557e8;
+                border-color: #7667f825;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="layout">
+
+    <aside class="brand-panel">
+        <div class="brand-name">
+            <div class="brand-icon">✳</div>
+            <span>Universal Business OS</span>
+        </div>
+
+        <div class="brand-content">
+            <div class="eyebrow">YOUR BUSINESS. ONE PLATFORM.</div>
+            <h2>Make room<br>for bigger ideas.</h2>
+            <p>
+                Bring your daily operations, customers, finances and
+                projects together in one organized workspace.
+            </p>
+
+            <div class="feature-list">
+                <div class="feature"><span>✓</span> Manage your business in one place</div>
+                <div class="feature"><span>✓</span> Keep track of sales and expenses</div>
+                <div class="feature"><span>✓</span> Turn information into better decisions</div>
+            </div>
+        </div>
+
+        <div class="brand-footer">A smarter workspace for ambitious businesses.</div>
+    </aside>
+
+    <main class="form-panel">
+        <div class="mobile-brand">
+            <div class="brand-icon">✳</div>
+            Universal Business OS
+        </div>
+
+        <h1>Welcome back</h1>
+        <p class="subtitle">Sign in to continue to your business workspace.</p>
+
+        {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+                <div class="flash">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="field">
+                <label for="email">EMAIL ADDRESS</label>
+                <input id="email" type="email" name="email"
+                       placeholder="you@company.com"
+                       autocomplete="email" required>
+            </div>
+
+            <div class="field">
+                <label for="password">PASSWORD</label>
+                <input id="password" type="password" name="password"
+                       placeholder="Enter your password"
+                       autocomplete="current-password" required>
+            </div>
+
+            <button class="submit" type="submit">Sign in to workspace →</button>
+        </form>
+
+        <div class="switch">
+            New to Business OS?
+            <a href="{{ url_for('register') }}">Create an account</a>
+        </div>
+
+        <div class="security">✦ &nbsp; Your workspace, ready when you are.</div>
+    </main>
+</div>
+</body>
+</html>

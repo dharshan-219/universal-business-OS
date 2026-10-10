@@ -1,0 +1,10 @@
+
+venv/
+__pycache__/
+*.py[cod]
+.env
+instance/*.db
+*.db
+*.sqlite
+*.sqlite3
+business_os_invalid_old.db

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Create Business</title>
+
+</head>
+
+<body>
+
+    <h1>Create Your Business</h1>
+
+
+    <form method="POST">
+
+        <label>
+            Business Name
+        </label>
+
+        <br>
+
+        <input
+            type="text"
+            name="name"
+            placeholder="Example: ABC Enterprises"
+            required
+        >
+
+        <br><br>
+
+
+        <label>
+            Business Type
+        </label>
+
+        <br>
+
+        <select name="business_type" required>
+
+            <option value="">
+                Select Business Type
+            </option>
+
+            <option value="Retail">
+                Retail
+            </option>
+
+            <option value="Wholesale">
+                Wholesale
+            </option>
+
+            <option value="Manufacturing">
+                Manufacturing
+            </option>
+
+            <option value="Restaurant">
+                Restaurant
+            </option>
+
+            <option value="Clothing">
+                Clothing
+            </option>
+
+            <option value="Electronics">
+                Electronics
+            </option>
+
+            <option value="Service">
+                Service
+            </option>
+
+            <option value="Agency">
+                Agency
+            </option>
+
+            <option value="Construction">
+                Construction
+            </option>
+
+            <option value="Education">
+                Education
+            </option>
+
+            <option value="Healthcare">
+                Healthcare
+            </option>
+
+            <option value="Logistics">
+                Logistics
+            </option>
+
+            <option value="E-commerce">
+                E-commerce
+            </option>
+
+            <option value="Other">
+                Other
+            </option>
+
+        </select>
+
+        <br><br>
+
+
+        <label>
+            Country
+        </label>
+
+        <br>
+
+        <input
+            type="text"
+            name="country"
+            value="India"
+            required
+        >
+
+        <br><br>
+
+
+        <label>
+            Currency
+        </label>
+
+        <br>
+
+        <select name="currency" required>
+
+            <option value="INR">
+                INR - Indian Rupee
+            </option>
+
+            <option value="USD">
+                USD - US Dollar
+            </option>
+
+            <option value="EUR">
+                EUR - Euro
+            </option>
+
+            <option value="GBP">
+                GBP - British Pound
+            </option>
+
+        </select>
+
+        <br><br>
+
+
+        <button type="submit">
+            Create Business
+        </button>
+
+    </form>
+
+
+    <br>
+
+    <a href="{{ url_for('dashboard') }}">
+        Back to Dashboard
+    </a>
+
+</body>
+
+</html>

@@ -1,0 +1,890 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers | {{ business.name }}</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .crm {
+            --crm-primary: #6257e8;
+            --crm-muted: #7b8499;
+            --crm-border: #e7eaf2;
+        }
+
+        .crm .topbar {
+            align-items: center;
+        }
+
+        .business-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border: 1px solid var(--crm-border);
+            border-radius: 13px;
+            background: white;
+        }
+
+        .business-avatar {
+            display: grid;
+            place-items: center;
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: #efedff;
+            color: #6257e8;
+            font-size: 19px;
+        }
+
+        .business-info strong,
+        .business-info span {
+            display: block;
+        }
+
+        .business-info strong {
+            max-width: 180px;
+            overflow-wrap: anywhere;
+            font-size: 12px;
+        }
+
+        .business-info span {
+            margin-top: 3px;
+            color: var(--crm-muted);
+            font-size: 11px;
+        }
+
+        .crm-hero {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 30px;
+            margin-bottom: 24px;
+            border-radius: 19px;
+            color: white;
+            background: linear-gradient(115deg, #171b3e, #342c78 70%, #6252b8);
+            box-shadow: 0 12px 32px #28235c17;
+        }
+
+        .crm-hero::after {
+            content: "";
+            position: absolute;
+            width: 230px;
+            height: 230px;
+            top: -120px;
+            right: 45px;
+            border: 1px solid #ffffff1a;
+            border-radius: 50%;
+            box-shadow: 0 0 0 30px #ffffff05,
+                        0 0 0 60px #ffffff04;
+            pointer-events: none;
+        }
+
+        .crm-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .crm-eyebrow {
+            display: inline-block;
+            margin-bottom: 13px;
+            color: #c8c1ff;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.7px;
+        }
+
+        .crm-hero h2 {
+            margin: 0 0 9px;
+            color: white;
+            font-size: clamp(24px, 3vw, 32px);
+            letter-spacing: -.8px;
+        }
+
+        .crm-hero p {
+            max-width: 520px;
+            margin: 0;
+            color: #d0d2eb;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .crm-hero-icon {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            place-items: center;
+            width: 75px;
+            height: 75px;
+            flex-shrink: 0;
+            border: 1px solid #ffffff30;
+            border-radius: 22px;
+            background: #ffffff12;
+            font-size: 32px;
+        }
+
+        .crm-section-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin: 28px 0 15px;
+        }
+
+        .crm-section-heading h2 {
+            margin: 0 0 5px;
+            font-size: 18px;
+        }
+
+        .crm-section-heading p {
+            margin: 0;
+            color: var(--crm-muted);
+            font-size: 12px;
+        }
+
+        .crm-kpis {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 15px;
+            margin-bottom: 26px;
+        }
+
+        .crm-kpi {
+            padding: 20px;
+            border: 1px solid var(--crm-border);
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 3px 12px #17204405;
+        }
+
+        .crm-kpi-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 17px;
+        }
+
+        .crm-kpi-icon {
+            display: grid;
+            place-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #efedff;
+            font-size: 18px;
+        }
+
+        .crm-kpi-icon.green { background: #e5f8ed; }
+        .crm-kpi-icon.blue { background: #e9f2ff; }
+
+        .crm-kpi-label {
+            color: #858da1;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .7px;
+            text-transform: uppercase;
+        }
+
+        .crm-kpi h3 {
+            margin: 0 0 5px;
+            font-size: 28px;
+            letter-spacing: -.8px;
+        }
+
+        .crm-kpi p {
+            margin: 0;
+            color: var(--crm-muted);
+            font-size: 11px;
+        }
+
+        .crm-workspace {
+            display: grid;
+            grid-template-columns: minmax(270px, .78fr) minmax(0, 1.5fr);
+            align-items: start;
+            gap: 20px;
+        }
+
+        .crm .section {
+            min-width: 0;
+            padding: 23px;
+        }
+
+        .crm-panel-title {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 23px;
+        }
+
+        .crm-panel-icon {
+            display: grid;
+            place-items: center;
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: #efedff;
+            color: #6257e8;
+            font-size: 18px;
+        }
+
+        .crm-panel-title h2 {
+            margin: 0 0 5px;
+            font-size: 17px;
+        }
+
+        .crm-panel-title p {
+            margin: 0;
+            color: var(--crm-muted);
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .crm-form label {
+            display: block;
+            margin: 15px 0 7px;
+            color: #35405a;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .crm-form input,
+        .crm-form textarea {
+            width: 100%;
+            min-width: 0;
+            padding: 12px;
+            border: 1px solid #dfe4ef;
+            border-radius: 10px;
+            outline: none;
+            background: #fcfcff;
+            color: #182033;
+            font: inherit;
+            font-size: 12px;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .crm-form input { min-height: 44px; }
+
+        .crm-form textarea {
+            min-height: 83px;
+            resize: vertical;
+        }
+
+        .crm-form input:focus,
+        .crm-form textarea:focus {
+            border-color: #7667f8;
+            box-shadow: 0 0 0 3px #7667f81b;
+            background: white;
+        }
+
+        .crm-form input::placeholder,
+        .crm-form textarea::placeholder {
+            color: #9ba3b5;
+        }
+
+        .crm-submit {
+            width: 100%;
+            min-height: 46px;
+            margin-top: 20px;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(100deg, #6257e8, #8974ff);
+            color: white;
+            font-weight: 750;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 7px 17px #7667f829;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .crm-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px #7667f83a;
+        }
+
+        .crm-flash {
+            margin-bottom: 12px;
+            padding: 13px 15px;
+            border: 1px solid #d7d2ff;
+            border-radius: 11px;
+            background: #f2f0ff;
+            color: #4438a8;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .crm-flash.error {
+            border-color: #fecaca;
+            background: #fff1f2;
+            color: #b42335;
+        }
+
+        .crm-table-tools {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .crm-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            background: #efedff;
+            color: #5548d7;
+            font-size: 11px;
+            font-weight: 750;
+        }
+
+        .crm-search {
+            flex: 1;
+            min-width: 140px;
+            max-width: 240px;
+            height: 40px;
+            padding: 0 12px;
+            border: 1px solid #e2e6ef;
+            border-radius: 9px;
+            outline: none;
+            background: #fcfcff;
+            font: inherit;
+            font-size: 12px;
+        }
+
+        .crm-search:focus {
+            border-color: #7667f8;
+            box-shadow: 0 0 0 3px #7667f81b;
+        }
+
+        .crm-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #e9ecf3;
+            border-radius: 11px;
+        }
+
+        .crm-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .crm-table th {
+            padding: 13px 14px;
+            background: #f8f9fd;
+            color: #788197;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .65px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .crm-table td {
+            padding: 14px;
+            border-top: 1px solid #edf0f5;
+            color: #4b556b;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+        .crm-table tbody tr:hover { background: #fafaff; }
+
+        .crm-customer {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 155px;
+        }
+
+        .crm-initial {
+            display: grid;
+            place-items: center;
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            border-radius: 11px;
+            background: #efedff;
+            color: #5548d7;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .crm-customer strong {
+            display: block;
+            color: #242d44;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .crm-customer small {
+            display: block;
+            margin-top: 4px;
+            color: #8a92a5;
+            font-size: 10px;
+        }
+
+        .crm-contact {
+            min-width: 130px;
+            overflow-wrap: anywhere;
+        }
+
+        .crm-address {
+            min-width: 125px;
+            max-width: 220px;
+            overflow-wrap: anywhere;
+        }
+
+        .crm-empty {
+            padding: 35px 15px;
+            text-align: center;
+        }
+
+        .crm-empty-icon {
+            display: grid;
+            place-items: center;
+            width: 53px;
+            height: 53px;
+            margin: 0 auto 14px;
+            border-radius: 16px;
+            background: #efedff;
+            font-size: 24px;
+        }
+
+        .crm-empty h3 {
+            margin: 0 0 7px;
+            font-size: 15px;
+        }
+
+        .crm-empty p {
+            margin: 0;
+            color: var(--crm-muted);
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .crm-empty-row td {
+            padding: 0;
+        }
+
+        .crm-empty-row[hidden] { display: none; }
+
+        .crm-quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .crm-quick-actions a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 14px;
+            border: 1px solid #e2e5ef;
+            border-radius: 10px;
+            background: white;
+            color: #46506a;
+            font-size: 12px;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        .crm-quick-actions a:hover {
+            border-color: #c8c2ff;
+            background: #faf9ff;
+            color: #5548d7;
+            text-decoration: none;
+        }
+
+        @media (max-width: 1050px) {
+            .crm-workspace {
+                grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+            }
+        }
+
+        @media (max-width: 850px) {
+            .crm-workspace { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 700px) {
+            .business-info { display: none; }
+
+            .crm-hero {
+                padding: 24px 20px;
+            }
+
+            .crm-hero-icon {
+                width: 55px;
+                height: 55px;
+                border-radius: 16px;
+                font-size: 25px;
+            }
+
+            .crm-kpis { gap: 10px; }
+
+            .crm-kpi { padding: 14px; }
+
+            .crm-kpi h3 { font-size: 23px; }
+
+            .crm .section { padding: 16px; }
+
+            .crm-search {
+                max-width: none;
+                width: 100%;
+            }
+
+            .crm-table-tools { align-items: stretch; }
+        }
+
+        @media (max-width: 420px) {
+            .crm-kpis { grid-template-columns: 1fr; }
+
+            .crm-kpi {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .crm-kpi-top { margin: 0; }
+
+            .crm-kpi-icon {
+                width: 42px;
+                height: 42px;
+            }
+
+            .crm-kpi h3 { margin-top: 2px; }
+
+            .crm-hero-icon { display: none; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>Business OS</h2>
+            <p>{{ business.name }}</p>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('business_workspace', business_id=business.id) }}">📊 Dashboard</a>
+            <a href="{{ url_for('customers', business_id=business.id) }}" class="active">👥 Customers</a>
+            <a href="{{ url_for('products', business_id=business.id) }}">📦 Products</a>
+            <a href="{{ url_for('sales', business_id=business.id) }}">🛒 Sales</a>
+            <a href="{{ url_for('inventory', business_id=business.id) }}">📋 Inventory</a>
+            <a href="{{ url_for('purchases', business_id=business.id) }}">🚚 Purchases</a>
+            <a href="{{ url_for('finance', business_id=business.id) }}">💰 Finance</a>
+            <a href="{{ url_for('employees', business_id=business.id) }}">👨‍💼 Employees</a>
+            <a href="{{ url_for('projects', business_id=business.id) }}">📋 Projects</a>
+            <a href="{{ url_for('support', business_id=business.id) }}">🎧 Support</a>
+            <a href="{{ url_for('reports', business_id=business.id) }}">📈 Reports</a>
+            <a href="{{ url_for('business_settings', business_id=business.id) }}">⚙️ Settings</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('dashboard') }}">← My Businesses</a>
+            <a href="{{ url_for('logout') }}">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main crm">
+
+        <header class="topbar">
+            <div>
+                <h1>Customers</h1>
+                <p>Build stronger relationships with every customer.</p>
+            </div>
+
+            <div class="business-info">
+                <div class="business-avatar">♧</div>
+                <div>
+                    <strong>{{ business.name }}</strong>
+                    <span>{{ business.business_type }}</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <!-- INTRODUCTION -->
+            <div class="crm-hero">
+                <div class="crm-hero-content">
+                    <span class="crm-eyebrow">CUSTOMER RELATIONSHIPS</span>
+                    <h2>Know your customers.</h2>
+                    <p>
+                        Keep important contacts organized, maintain useful
+                        customer information, and make every relationship
+                        easier to manage.
+                    </p>
+                </div>
+                <div class="crm-hero-icon" aria-hidden="true">♧</div>
+            </div>
+
+            <!-- FLASH MESSAGES -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <div class="crm-flash{% if category in ['error', 'danger'] %} error{% endif %}"
+                         role="status">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endwith %}
+
+            <!-- SUMMARY -->
+            <div class="crm-section-heading">
+                <div>
+                    <h2>Customer overview</h2>
+                    <p>Your customer records at a glance.</p>
+                </div>
+            </div>
+
+            <div class="crm-kpis">
+                <div class="crm-kpi">
+                    <div class="crm-kpi-top">
+                        <div class="crm-kpi-icon">👥</div>
+                    </div>
+                    <div>
+                        <h3>{{ customers|length }}</h3>
+                        <p>Total customers</p>
+                    </div>
+                </div>
+
+                <div class="crm-kpi">
+                    <div class="crm-kpi-top">
+                        <div class="crm-kpi-icon green">✉</div>
+                    </div>
+                    <div>
+                        <h3>{{ customers|selectattr('email')|list|length }}</h3>
+                        <p>With email addresses</p>
+                    </div>
+                </div>
+
+                <div class="crm-kpi">
+                    <div class="crm-kpi-top">
+                        <div class="crm-kpi-icon blue">☎</div>
+                    </div>
+                    <div>
+                        <h3>{{ customers|selectattr('phone')|list|length }}</h3>
+                        <p>With phone numbers</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORM AND CUSTOMER TABLE -->
+            <div class="crm-workspace">
+
+                <!-- ADD CUSTOMER -->
+                <section class="section">
+                    <div class="crm-panel-title">
+                        <div class="crm-panel-icon">＋</div>
+                        <div>
+                            <h2>Add a customer</h2>
+                            <p>Create a new customer record for your business.</p>
+                        </div>
+                    </div>
+
+                    <form class="crm-form"
+                          method="POST"
+                          action="{{ url_for('add_customer', business_id=business.id) }}">
+
+                        <label for="name">Customer name *</label>
+                        <input type="text"
+                               id="name"
+                               name="name"
+                               placeholder="e.g. Alex Johnson"
+                               autocomplete="name"
+                               required>
+
+                        <label for="phone">Phone number</label>
+                        <input type="text"
+                               id="phone"
+                               name="phone"
+                               placeholder="Enter phone number"
+                               autocomplete="tel">
+
+                        <label for="email">Email address</label>
+                        <input type="email"
+                               id="email"
+                               name="email"
+                               placeholder="name@example.com"
+                               autocomplete="email">
+
+                        <label for="address">Address</label>
+                        <textarea id="address"
+                                  name="address"
+                                  placeholder="Customer address"
+                                  rows="3"></textarea>
+
+                        <label for="notes">Additional notes</label>
+                        <textarea id="notes"
+                                  name="notes"
+                                  placeholder="Preferences or useful details"
+                                  rows="3"></textarea>
+
+                        <button class="crm-submit" type="submit">
+                            + &nbsp; Save customer
+                        </button>
+                    </form>
+                </section>
+
+                <!-- CUSTOMER LIST -->
+                <section class="section">
+                    <div class="crm-panel-title">
+                        <div class="crm-panel-icon">☷</div>
+                        <div>
+                            <h2>Customer directory</h2>
+                            <p>Browse and find your customer records.</p>
+                        </div>
+                    </div>
+
+                    <div class="crm-table-tools">
+                        <span class="crm-count">
+                            {{ customers|length }} customers
+                        </span>
+
+                        <input
+                            class="crm-search"
+                            id="customerSearch"
+                            type="search"
+                            placeholder="⌕  Search customers..."
+                            aria-label="Search customers">
+                    </div>
+
+                    {% if customers %}
+                        <div class="crm-table-wrap">
+                            <table class="crm-table">
+                                <thead>
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Contact details</th>
+                                        <th>Address</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="customerTableBody">
+                                    {% for customer in customers %}
+                                        <tr class="customer-row">
+                                            <td>
+                                                <div class="crm-customer">
+                                                    <div class="crm-initial">
+                                                        {{ customer.name[:1]|upper }}
+                                                    </div>
+                                                    <div>
+                                                        <strong>{{ customer.name }}</strong>
+                                                        <small>Customer #{{ loop.index }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td class="crm-contact">
+                                                <div>{{ customer.email or 'No email provided' }}</div>
+                                                <div style="margin-top:5px;color:#858da1;">
+                                                    {{ customer.phone or 'No phone provided' }}
+                                                </div>
+                                            </td>
+
+                                            <td class="crm-address">
+                                                {{ customer.address or 'No address provided' }}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+
+                                    <tr id="noSearchResults" class="crm-empty-row" hidden>
+                                        <td colspan="3">
+                                            <div class="crm-empty">
+                                                <div class="crm-empty-icon">⌕</div>
+                                                <h3>No matching customers</h3>
+                                                <p>Try another name, email, phone number or address.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="crm-empty">
+                            <div class="crm-empty-icon">♧</div>
+                            <h3>Your customer directory is ready</h3>
+                            <p>
+                                You haven't added any customers yet.
+                                Use the form to create your first customer record.
+                            </p>
+                        </div>
+                    {% endif %}
+                </section>
+
+            </div>
+
+            <!-- QUICK ACTIONS -->
+            <div class="crm-section-heading">
+                <div>
+                    <h2>Continue working</h2>
+                    <p>Move to another area of your business.</p>
+                </div>
+            </div>
+
+            <section class="section">
+                <div class="crm-quick-actions">
+                    <a href="{{ url_for('products', business_id=business.id) }}">
+                        📦 &nbsp; View products
+                    </a>
+
+                    <a href="{{ url_for('sales', business_id=business.id) }}">
+                        🛒 &nbsp; Manage sales
+                    </a>
+
+                    <a href="{{ url_for('business_workspace', business_id=business.id) }}">
+                        📊 &nbsp; Back to dashboard
+                    </a>
+                </div>
+            </section>
+
+        </section>
+    </main>
+</div>
+
+<script>
+(function () {
+    const search = document.getElementById("customerSearch");
+    const tbody = document.getElementById("customerTableBody");
+    const noResults = document.getElementById("noSearchResults");
+
+    if (!search || !tbody) return;
+
+    search.addEventListener("input", function () {
+        const query = search.value.trim().toLowerCase();
+        const rows = tbody.querySelectorAll(".customer-row");
+        let visibleCount = 0;
+
+        rows.forEach(function (row) {
+            const matches = row.textContent.toLowerCase().includes(query);
+            row.hidden = !matches;
+
+            if (matches) visibleCount++;
+        });
+
+        if (noResults) {
+            noResults.hidden = visibleCount !== 0;
+        }
+    });
+})();
+</script>
+
+</body>
+</html>

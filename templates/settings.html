@@ -1,0 +1,567 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Business Settings | {{ business.name }}</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f4f6fb;
+            color: #172033;
+        }
+
+        .settings-page {
+            padding: 28px;
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        .settings-hero {
+            position: relative;
+            overflow: hidden;
+            padding: 32px;
+            border-radius: 22px;
+            background: linear-gradient(120deg, #172554, #4338ca, #7c3aed);
+            color: white;
+            margin-bottom: 25px;
+        }
+
+        .settings-hero::after {
+            content: "";
+            position: absolute;
+            width: 230px;
+            height: 230px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.07);
+            right: -55px;
+            top: -90px;
+        }
+
+        .settings-hero h1 {
+            margin: 0 0 10px;
+            font-size: 30px;
+        }
+
+        .settings-hero p {
+            margin: 0;
+            color: #e0e7ff;
+            line-height: 1.7;
+            max-width: 650px;
+        }
+
+        .settings-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .settings-card {
+            background: #fff;
+            border: 1px solid #e7eaf2;
+            border-radius: 18px;
+            padding: 26px;
+            margin-bottom: 22px;
+            box-shadow: 0 5px 20px rgba(28, 39, 76, 0.04);
+            min-width: 0;
+        }
+
+        .settings-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 25px;
+        }
+
+        .settings-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            border-radius: 14px;
+            background: #eef2ff;
+            font-size: 23px;
+        }
+
+        .settings-card-header h2 {
+            font-size: 19px;
+            margin: 2px 0 7px;
+        }
+
+        .settings-card-header p {
+            color: #8590a4;
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .settings-form {
+            display: flex;
+            flex-direction: column;
+            gap: 19px;
+        }
+
+        .settings-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .settings-field label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #344054;
+        }
+
+        .settings-field input {
+            width: 100%;
+            min-height: 46px;
+            padding: 12px 14px;
+            border: 1px solid #dfe4ee;
+            border-radius: 10px;
+            background: #fbfcff;
+            color: #172033;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .settings-field input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+            background: #fff;
+        }
+
+        .settings-field small {
+            font-size: 12px;
+            color: #8993a5;
+            line-height: 1.5;
+        }
+
+        .settings-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            padding-top: 8px;
+            border-top: 1px solid #edf0f5;
+        }
+
+        .settings-help {
+            color: #8993a5;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .save-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 21px;
+            border: none;
+            border-radius: 10px;
+            background: #4f46e5;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .save-button:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        .info-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 16px 0;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #8590a4;
+            font-size: 13px;
+        }
+
+        .info-value {
+            color: #27334b;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: right;
+            overflow-wrap: anywhere;
+            max-width: 60%;
+        }
+
+        .business-id {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 7px;
+            background: #eef2ff;
+            color: #4338ca;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .security-note {
+            padding: 17px;
+            border-radius: 12px;
+            background: #f0fdf4;
+            border: 1px solid #dcfce7;
+            color: #166534;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .security-note strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .settings-tip {
+            padding: 17px;
+            border-radius: 12px;
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            color: #92400e;
+            font-size: 12px;
+            line-height: 1.7;
+            margin-top: 18px;
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-message {
+            padding: 14px 17px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+            font-size: 14px;
+        }
+
+        @media (max-width: 950px) {
+            .settings-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .settings-page {
+                padding: 14px;
+            }
+
+            .settings-hero {
+                padding: 24px;
+            }
+
+            .settings-hero h1 {
+                font-size: 25px;
+            }
+
+            .settings-card {
+                padding: 19px;
+            }
+
+            .settings-actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .save-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h2>Business OS</h2>
+            <p>{{ business.name }}</p>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('business_workspace', business_id=business.id) }}">📊 Dashboard</a>
+            <a href="{{ url_for('customers', business_id=business.id) }}">👥 Customers</a>
+            <a href="{{ url_for('products', business_id=business.id) }}">📦 Products</a>
+            <a href="{{ url_for('sales', business_id=business.id) }}">🛒 Sales</a>
+            <a href="{{ url_for('inventory', business_id=business.id) }}">📋 Inventory</a>
+            <a href="{{ url_for('purchases', business_id=business.id) }}">🚚 Purchases</a>
+            <a href="{{ url_for('finance', business_id=business.id) }}">💰 Finance</a>
+            <a href="{{ url_for('employees', business_id=business.id) }}">👨‍💼 Employees</a>
+            <a href="{{ url_for('projects', business_id=business.id) }}">📋 Projects</a>
+            <a href="{{ url_for('support', business_id=business.id) }}">🎧 Support</a>
+            <a href="{{ url_for('reports', business_id=business.id) }}">📈 Reports</a>
+            <a class="active"
+               href="{{ url_for('business_settings', business_id=business.id) }}">⚙️ Settings</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('dashboard') }}">← My Businesses</a>
+            <a href="{{ url_for('logout') }}">🚪 Logout</a>
+        </div>
+
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <header class="topbar">
+            <div>
+                <strong>Business Settings</strong>
+            </div>
+            <div>⚙️ Configuration</div>
+        </header>
+
+        <section class="settings-page">
+
+            <!-- HERO -->
+            <div class="settings-hero">
+                <h1>Business Settings ⚙️</h1>
+                <p>
+                    Manage your business identity, business category,
+                    country and currency. Your settings help keep your
+                    workspace configured for your business.
+                </p>
+            </div>
+
+            <!-- FLASH MESSAGES -->
+            <div class="flash-messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                        <div class="flash-message">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endwith %}
+            </div>
+
+            <div class="settings-layout">
+
+                <!-- GENERAL SETTINGS -->
+                <div class="settings-card">
+
+                    <div class="settings-card-header">
+                        <div class="settings-icon">🏢</div>
+                        <div>
+                            <h2>General Information</h2>
+                            <p>
+                                Update the main details associated with
+                                your business workspace.
+                            </p>
+                        </div>
+                    </div>
+
+                    <form class="settings-form"
+                          method="POST"
+                          action="{{ url_for('business_settings', business_id=business.id) }}">
+
+                        <div class="settings-field">
+                            <label for="name">Business Name</label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                value="{{ business.name }}"
+                                maxlength="150"
+                                autocomplete="organization"
+                                required
+                            >
+                            <small>The name displayed throughout your workspace.</small>
+                        </div>
+
+                        <div class="settings-field">
+                            <label for="business_type">Business Type</label>
+                            <input
+                                type="text"
+                                id="business_type"
+                                name="business_type"
+                                value="{{ business.business_type }}"
+                                maxlength="100"
+                                placeholder="e.g. Retail, Technology, Services"
+                                required
+                            >
+                            <small>Describe the main category of your business.</small>
+                        </div>
+
+                        <div class="settings-field">
+                            <label for="country">Country</label>
+                            <input
+                                type="text"
+                                id="country"
+                                name="country"
+                                value="{{ business.country }}"
+                                maxlength="100"
+                                autocomplete="country-name"
+                                placeholder="e.g. India"
+                                required
+                            >
+                        </div>
+
+                        <div class="settings-field">
+                            <label for="currency">Currency Code or Symbol</label>
+                            <input
+                                type="text"
+                                id="currency"
+                                name="currency"
+                                value="{{ business.currency }}"
+                                maxlength="20"
+                                placeholder="INR or ₹"
+                                required
+                            >
+                            <small>
+                                Example: INR, ₹, USD or $. Use the currency
+                                appropriate for your business records.
+                            </small>
+                        </div>
+
+                        <div class="settings-actions">
+                            <div class="settings-help">
+                                Changes apply when you save the form.
+                            </div>
+
+                            <button type="submit" class="save-button">
+                                💾 Save Settings
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <!-- BUSINESS DETAILS -->
+                <div>
+
+                    <div class="settings-card">
+
+                        <div class="settings-card-header">
+                            <div class="settings-icon">📋</div>
+                            <div>
+                                <h2>Business Overview</h2>
+                                <p>
+                                    Review the information currently
+                                    stored for this workspace.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="info-list">
+
+                            <div class="info-row">
+                                <span class="info-label">Business ID</span>
+                                <span class="info-value">
+                                    <span class="business-id">
+                                        #{{ business.id }}
+                                    </span>
+                                </span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">Business Name</span>
+                                <span class="info-value">
+                                    {{ business.name }}
+                                </span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">Business Type</span>
+                                <span class="info-value">
+                                    {{ business.business_type }}
+                                </span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">Country</span>
+                                <span class="info-value">
+                                    {{ business.country }}
+                                </span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">Currency</span>
+                                <span class="info-value">
+                                    {{ business.currency }}
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="settings-card">
+
+                        <div class="settings-card-header">
+                            <div class="settings-icon">🛡️</div>
+                            <div>
+                                <h2>Data Protection</h2>
+                                <p>Important information about your records.</p>
+                            </div>
+                        </div>
+
+                        <div class="security-note">
+                            <strong>✓ Your business records</strong>
+                            Updating these settings is intended to change
+                            business information only. It does not require
+                            deleting your existing customers, products,
+                            sales, purchases, employees, projects or
+                            support tickets.
+                        </div>
+
+                        <div class="settings-tip">
+                            <strong>Tip:</strong> Keep your business name,
+                            country and currency accurate. Changing the
+                            currency label does not automatically convert
+                            amounts already stored in your database.
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>
+```
